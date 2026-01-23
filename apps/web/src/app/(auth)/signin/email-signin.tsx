@@ -59,7 +59,7 @@ export function EmailSignIn() {
         setIsLoading(false);
       }
     },
-    [router]
+    [router],
   );
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -68,7 +68,7 @@ export function EmailSignIn() {
     const formData = new FormData(e.currentTarget);
 
     const { success, data, error } = schema.safeParse(
-      Object.fromEntries(formData)
+      Object.fromEntries(formData),
     );
 
     if (!success) {

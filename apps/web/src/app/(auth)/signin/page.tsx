@@ -1,7 +1,9 @@
+import { CommandIcon } from 'lucide-react';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { OAuthButtons } from '~/app/(auth)/signin/oauth-buttons';
 import { authServer } from '~/lib/auth/server';
+import { siteConfig } from '~/lib/site';
 import { EmailSignIn } from './email-signin';
 
 export default async function AuthenticationPage() {
@@ -14,16 +16,22 @@ export default async function AuthenticationPage() {
   }
 
   return (
-    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-      <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Create an account or sign in
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Select an authentication method to continue
-        </p>
+    <div className="w-full rounded-2xl bg-background/80 p-8 backdrop-blur">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/70 bg-background shadow-sm">
+          <CommandIcon className="h-5 w-5" />
+        </div>
+        <div className="space-y-1">
+          <h1 className="text-[32px] font-normal leading-[36px] tracking-[-0.96px] font-['Perfectly_Nineties',serif]">
+            Welcome to {siteConfig.name}
+          </h1>
+          <p className="text-[14px] font-medium leading-5 tracking-[-0.32px] text-[#666666] dark:text-muted-foreground font-(family-name:--font-inter)">
+            Login or create an account
+          </p>
+        </div>
       </div>
-      <div className="grid gap-6">
+
+      <div className="mt-6 grid gap-6">
         <div className="space-y-1">
           <OAuthButtons />
         </div>
@@ -40,6 +48,9 @@ export default async function AuthenticationPage() {
           <EmailSignIn />
         </div>
       </div>
+      <p className="mt-6 text-center text-xs text-muted-foreground">
+        By continuing, you agree to our Terms and Privacy Policy.
+      </p>
     </div>
   );
 }
