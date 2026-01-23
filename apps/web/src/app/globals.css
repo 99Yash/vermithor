@@ -155,15 +155,15 @@
 
   /* Text gradient utilities */
   .text-gradient {
-    @apply bg-gradient-to-r from-foreground via-foreground/90 to-foreground/80 bg-clip-text text-transparent;
+    @apply bg-linear-to-r from-foreground via-foreground/90 to-foreground/80 bg-clip-text text-transparent;
   }
 
   .text-gradient-brand {
-    @apply bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 bg-clip-text text-transparent dark:from-violet-400 dark:via-fuchsia-400 dark:to-pink-400;
+    @apply bg-linear-to-r from-amber-700 via-amber-600 to-yellow-500 bg-clip-text text-transparent dark:from-amber-300 dark:via-amber-200 dark:to-yellow-200;
   }
 
   .text-gradient-subtle {
-    @apply bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent;
+    @apply bg-linear-to-br from-foreground to-foreground/60 bg-clip-text text-transparent;
   }
 
   /* Text highlights and emphasis */
@@ -173,11 +173,11 @@
 
   .text-highlight::after {
     content: '';
-    @apply absolute -bottom-1 left-0 right-0 -z-10 h-3 bg-gradient-to-r from-violet-500/30 via-fuchsia-500/30 to-pink-500/30 blur-sm;
+    @apply absolute -bottom-1 left-0 right-0 -z-10 h-3 bg-linear-to-r from-amber-500/25 via-orange-400/25 to-yellow-400/25 blur-sm;
   }
 
   .text-emphasis {
-    @apply relative inline-block rounded-md bg-gradient-to-r from-violet-500/10 via-fuchsia-500/10 to-pink-500/10 px-2 py-0.5 font-medium;
+    @apply relative inline-block rounded-md bg-linear-to-r from-amber-500/10 via-orange-400/10 to-yellow-400/10 px-2 py-0.5 font-medium;
   }
 
   /* Enhanced typography */
@@ -206,11 +206,11 @@
 
   /* Subtle glow effects */
   .glow-text {
-    @apply drop-shadow-[0_0_15px_rgba(168,85,247,0.15)];
+    @apply drop-shadow-[0_0_15px_rgba(217,119,6,0.18)];
   }
 
   .glow-text-strong {
-    @apply drop-shadow-[0_0_25px_rgba(168,85,247,0.25)];
+    @apply drop-shadow-[0_0_25px_rgba(217,119,6,0.28)];
   }
 
   /* Code-like styling for emphasis */
@@ -225,7 +225,7 @@
 
   .link-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 transition-transform duration-300;
+    @apply absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-linear-to-r from-amber-500 via-orange-400 to-yellow-400 transition-transform duration-300;
   }
 
   .link-underline:hover::after {
