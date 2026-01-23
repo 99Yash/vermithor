@@ -58,12 +58,12 @@ const workflowSteps = [
   {
     title: 'Upload + validate',
     description:
-      'Choose a resume file. We validate format and size before parsing.',
+      'Choose a résumé file. We validate format and size before parsing.',
   },
   {
     title: 'Parse + extract profile',
     description:
-      'We read the resume and extract roles, skills, and signals into a profile.',
+      'We read the résumé and extract roles, skills, and signals into a profile.',
   },
   {
     title: 'Durable job fetch',
@@ -195,13 +195,13 @@ export function LandingClient() {
               variant="secondary"
               className="w-fit border-amber-200/70 bg-amber-100/70 text-amber-900/80 shadow-sm shadow-amber-500/10 dark:border-amber-200/25 dark:bg-amber-500/15 dark:text-amber-100/90 dark:shadow-amber-500/25"
             >
-              Resume → Career Matches
+              Résumé → Career Matches
             </Badge>
             <div className="space-y-4">
               <h1 className="heading-xl text-balance">
-                Turn your resume into{' '}
-                <span className="text-gradient-brand">career matches</span> that
-                stream in real time.
+                Turn your résumé into{' '}
+                <span className="text-gradient-brand">career matches</span>{' '}
+                streaming in real time.
               </h1>
               <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
                 Upload once. We validate, parse, and extract a profile. A
@@ -254,10 +254,7 @@ export function LandingClient() {
               </div>
               <div className="mt-6 space-y-4">
                 {streamItems.map((item) => (
-                  <div
-                    key={item.title}
-                    className={surfaceCardClass}
-                  >
+                  <div key={item.title} className={surfaceCardClass}>
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold">{item.title}</p>
                       <Badge
@@ -290,7 +287,7 @@ export function LandingClient() {
               Workflow built for momentum
             </h2>
             <p className="text-pretty text-base text-muted-foreground">
-              The experience follows a clear state machine: validate the resume,
+              The experience follows a clear state machine: validate the résumé,
               parse and extract a profile, queue durable job fetches, then
               stream analysis into results you can explore.
             </p>
@@ -387,7 +384,7 @@ export function LandingClient() {
             </div>
           </div>
           <div className={sectionCardClass}>
-            <h3 className="text-2xl font-semibold">Resume improvement loop</h3>
+            <h3 className="text-2xl font-semibold">Résumé improvement loop</h3>
             <p className="mt-3 text-sm text-muted-foreground">
               Suggestions stream into the editor so you can refine quickly, save
               safely, and re-run matches when you are ready.
@@ -411,7 +408,7 @@ export function LandingClient() {
             Ready to stream your next matches?
           </h2>
           <p className="mt-4 text-pretty text-base text-muted-foreground">
-            Start with a resume upload, watch the workflow run, and explore
+            Start with a résumé upload, watch the workflow run, and explore
             matches as they arrive.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -435,7 +432,7 @@ export function LandingClient() {
         </section>
 
         <footer className="flex flex-col items-center gap-4 border-t border-border/60 pt-8 text-sm text-muted-foreground dark:border-amber-200/10 sm:flex-row sm:justify-between">
-          <span>{siteConfig.name} | Resume to career matches</span>
+          <span>{siteConfig.name} | Résumé to career matches</span>
           <div className="flex items-center gap-4">
             {socialLinks.map((link) => {
               const Icon = link.icon;
