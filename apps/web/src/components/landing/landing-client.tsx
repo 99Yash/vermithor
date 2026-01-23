@@ -197,7 +197,7 @@ export function LandingClient() {
             <div className="space-y-4">
               <h1 className="heading-xl text-balance">
                 Your résumé. <span className="text-gradient-brand">Jobs</span>{' '}
-                streaming real time.
+                streaming in real time.
               </h1>
               <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
                 Upload once. We read it, learn your story, and surface roles
