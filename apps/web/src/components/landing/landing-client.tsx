@@ -194,12 +194,6 @@ export function LandingClient() {
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-20 px-6 pb-20 pt-16 lg:px-10">
         <section className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="flex flex-col gap-6">
-            <Badge
-              variant="secondary"
-              className="w-fit border-amber-200/70 bg-amber-100/70 text-amber-900/80 shadow-sm shadow-amber-500/10 dark:border-amber-200/25 dark:bg-amber-500/15 dark:text-amber-100/90 dark:shadow-amber-500/25"
-            >
-              Résumé to matches
-            </Badge>
             <div className="space-y-4">
               <h1 className="heading-xl text-balance">
                 Your résumé. <span className="text-gradient-brand">Jobs</span>{' '}

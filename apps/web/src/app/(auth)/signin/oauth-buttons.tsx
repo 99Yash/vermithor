@@ -49,7 +49,7 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
 
       setLocalStorageItem(
         'LAST_AUTH_METHOD',
-        providerId.toUpperCase() as AuthOptionsType
+        providerId.toUpperCase() as AuthOptionsType,
       );
     } catch (error) {
       toast.error(getErrorMessage(error));
