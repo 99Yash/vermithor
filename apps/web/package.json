@@ -9,9 +9,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@vermithor/api": "workspace:*",
-    "@vermithor/auth": "workspace:*",
-    "@vermithor/db": "workspace:*",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -40,11 +37,14 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@tanstack/react-form": "^1.12.3",
-    "@tanstack/react-query": "^5.85.5",
+    "@tanstack/react-query": "^5.90.7",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
     "@trpc/tanstack-react-query": "^11.5.0",
     "@types/pg": "^8.15.6",
+    "@vermithor/api": "workspace:*",
+    "@vermithor/auth": "workspace:*",
+    "@vermithor/db": "workspace:*",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",
     "class-variance-authority": "^0.7.1",
@@ -54,6 +54,7 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.546.0",
+    "motion": "^12.29.0",
     "next": "16.0.0",
     "next-themes": "^0.4.6",
     "nuqs": "^2.7.2",
@@ -72,12 +73,12 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@vermithor/config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.10",
     "@tanstack/react-query-devtools": "^5.85.5",
     "@types/node": "catalog:",
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.2",
+    "@vermithor/config": "workspace:*",
     "tailwindcss": "^4.1.10",
     "typescript": "catalog:"
   }

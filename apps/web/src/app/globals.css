@@ -159,7 +159,7 @@
   }
 
   .text-gradient-brand {
-    @apply bg-linear-to-r from-amber-700 via-amber-600 to-yellow-500 bg-clip-text text-transparent dark:from-amber-300 dark:via-amber-200 dark:to-yellow-200;
+    @apply bg-linear-to-r from-amber-800 via-amber-600 to-orange-500 bg-clip-text text-transparent dark:from-amber-300 dark:via-amber-200 dark:to-orange-200;
   }
 
   .text-gradient-subtle {
@@ -173,11 +173,11 @@
 
   .text-highlight::after {
     content: '';
-    @apply absolute -bottom-1 left-0 right-0 -z-10 h-3 bg-linear-to-r from-amber-500/25 via-orange-400/25 to-yellow-400/25 blur-sm;
+    @apply absolute -bottom-1 left-0 right-0 -z-10 h-3 bg-linear-to-r from-amber-600/20 via-orange-500/20 to-amber-400/20 blur-sm;
   }
 
   .text-emphasis {
-    @apply relative inline-block rounded-md bg-linear-to-r from-amber-500/10 via-orange-400/10 to-yellow-400/10 px-2 py-0.5 font-medium;
+    @apply relative inline-block rounded-md bg-linear-to-r from-amber-600/10 via-orange-500/10 to-amber-400/10 px-2 py-0.5 font-medium;
   }
 
   /* Enhanced typography */
@@ -225,7 +225,7 @@
 
   .link-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-linear-to-r from-amber-500 via-orange-400 to-yellow-400 transition-transform duration-300;
+    @apply absolute bottom-0 left-0 h-px w-full origin-left scale-x-0 bg-linear-to-r from-amber-600 via-orange-500 to-amber-400 transition-transform duration-300;
   }
 
   .link-underline:hover::after {
@@ -245,6 +245,28 @@
   .shimmer {
     background-size: 200% 100%;
     animation: shimmer 8s linear infinite;
+  }
+
+  @keyframes dragon-drift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(-16px, 10px, 0);
+    }
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .dragon-drift {
+    animation: dragon-drift 20s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dragon-drift {
+      animation: none;
+    }
   }
 
   /* Better focus states */
