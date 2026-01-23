@@ -149,8 +149,6 @@ const socialLinks = [
 
 const primaryCtaClass =
   'group px-8 py-4 text-base font-semibold tracking-tight shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 dark:shadow-amber-500/30 dark:hover:shadow-amber-400/45';
-const secondaryCtaClass =
-  'px-8 py-4 dark:border-amber-200/30 dark:text-amber-100/90 dark:hover:border-amber-200/50';
 const sectionCardClass =
   'rounded-3xl border border-border/60 bg-card/70 p-8 shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-500/10';
 const featureCardClass =
@@ -229,14 +227,6 @@ export function LandingClient() {
                     →
                   </span>
                 </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className={secondaryCtaClass}
-              >
-                <Link href="#workflow">See the flow</Link>
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -455,14 +445,6 @@ export function LandingClient() {
                   →
                 </span>
               </Link>
-            </Button>
-            <Button
-              asChild
-              variant="ghost"
-              size="lg"
-              className={secondaryCtaClass}
-            >
-              <Link href="#workflow">See the flow</Link>
             </Button>
           </div>
         </section>
