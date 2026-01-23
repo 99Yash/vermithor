@@ -1,18 +1,46 @@
-import { createContext } from '@ciaran/api/context';
-import { appRouter } from '@ciaran/api/routers/index';
-import { auth } from '@ciaran/auth';
+import { createContext } from '@vermithor/api/context';
+import { appRouter } from '@vermithor/api/routers/index';
+import { auth } from '@vermithor/auth';
 import { cors } from '@elysiajs/cors';
 import { node } from '@elysiajs/node';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import 'dotenv/config';
 import { Elysia } from 'elysia';
 
+const rawCorsOrigins = [
+  process.env.CORS_ORIGIN,
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+const corsOrigins = new Set<string>();
+
+for (const value of rawCorsOrigins) {
+  if (value) {
+    for (const origin of value.split(',')) {
+      const trimmed = origin.trim();
+      if (trimmed) {
+        corsOrigins.add(trimmed);
+      }
+    }
+  }
+}
+
+if (process.env.NODE_ENV !== 'production') {
+  corsOrigins.add('http://localhost:3000');
+  corsOrigins.add('http://localhost:3001');
+}
+
 new Elysia({ adapter: node() })
   .use(
     cors({
-      origin: process.env.CORS_ORIGIN || '',
+      origin: corsOrigins.size > 0 ? Array.from(corsOrigins) : false,
       methods: ['GET', 'POST', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'trpc-accept',
+        'trpc-batch-mode',
+      ],
       credentials: true,
     })
   )

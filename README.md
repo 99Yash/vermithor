@@ -51,9 +51,9 @@ export const siteConfig = {
 };
 ```
 
-**Optional but recommended:** Update the package namespace from `@ciaran` to your own:
+**Optional but recommended:** Update the package namespace from `@vermithor` to your own:
 
-- Find and replace `@ciaran` with `@your-app-name` across:
+- Find and replace `@vermithor` with `@your-app-name` across:
   - `package.json` files in `apps/` and `packages/`
   - Import statements in your code
 - Update the root `package.json` name field

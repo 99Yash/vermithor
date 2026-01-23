@@ -1,5 +1,5 @@
 {
-  "name": "@vermithor/api",
+  "name": "@vermithor/redis",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -23,17 +23,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@ai-sdk/provider": "^3.0.5",
-    "@vermithor/auth": "workspace:*",
-    "@vermithor/db": "workspace:*",
-    "@vermithor/redis": "workspace:*",
-    "@trpc/client": "catalog:",
-    "@trpc/server": "catalog:",
-    "ai": "^6.0.48",
-    "ai-stream-utils": "^1.4.2",
-    "dotenv": "catalog:",
-    "elysia": "catalog:",
-    "resumable-stream": "^2.2.10",
+    "redis": "^5.10.0",
     "zod": "catalog:"
   }
 }

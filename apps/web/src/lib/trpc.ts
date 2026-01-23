@@ -1,6 +1,6 @@
-import type { AppRouter } from '@ciaran/api/routers/index';
+import type { AppRouter } from '@vermithor/api/routers/index';
 import { QueryCache, QueryClient } from '@tanstack/react-query';
-import { createTRPCClient, httpBatchLink } from '@trpc/client';
+import { createTRPCClient, httpBatchStreamLink } from '@trpc/client';
 import { createTRPCOptionsProxy } from '@trpc/tanstack-react-query';
 import { toast } from 'sonner';
 
@@ -19,10 +19,13 @@ export const queryClient = new QueryClient({
   }),
 });
 
+const serverUrl =
+  process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+
 const trpcClient = createTRPCClient<AppRouter>({
   links: [
-    httpBatchLink({
-      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/trpc`,
+    httpBatchStreamLink({
+      url: `${serverUrl}/trpc`,
       fetch(url, options) {
         return fetch(url, {
           ...options,

@@ -13,10 +13,10 @@
     "dev:native": "turbo run dev --filter=native",
     "dev:web": "turbo run dev --filter=web",
     "dev:server": "turbo run dev --filter=server",
-    "db:push": "turbo run db:push --filter=@ciaran/db",
-    "db:studio": "turbo run db:studio --filter=@ciaran/db",
-    "db:generate": "turbo run db:generate --filter=@ciaran/db",
-    "db:migrate": "turbo run db:migrate --filter=@ciaran/db"
+    "db:push": "turbo run db:push --filter=@vermithor/db",
+    "db:studio": "turbo run db:studio --filter=@vermithor/db",
+    "db:generate": "turbo run db:generate --filter=@vermithor/db",
+    "db:migrate": "turbo run db:migrate --filter=@vermithor/db"
   },
   "devDependencies": {
     "turbo": "^2.5.4",

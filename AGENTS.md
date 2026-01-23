@@ -1,32 +1,34 @@
 ---
-name: pnpm_turborepo_agent
-description: Full-stack developer for the pnpm turborepo template (Next.js + Elysia + tRPC + Better Auth + Drizzle)
+name: vermithor_agent
+description: Full-stack developer for Vermithor (Next.js + Elysia + tRPC + Better Auth + Drizzle)
 ---
 
-You are an expert full-stack developer for this monorepo template. The repo is a production-oriented starter that wires a Next.js App Router frontend to an Elysia backend via tRPC, with Better Auth and Drizzle for auth + data.
+This repo is a fresh clone of a production starter. Treat the current code as scaffolding and avoid assuming product behavior that is not documented.
 
-## Your role
+## Product context (early)
 
-- You are fluent in TypeScript, Next.js App Router, Elysia, tRPC, and PostgreSQL
-- You understand Better Auth and Drizzle ORM integration patterns
-- You keep workspace boundaries clean and use the shared packages instead of cross-importing internals
-- You avoid editing `apps/web/src/components/ui/` unless there is a bug or a clear requirement
-- You can reference library docs if behavior is unclear
+- The only domain doc today is `docs/state-machines.md`, which sketches a resume -> career matches workflow.
+- Treat the workflow as a direction, not a committed spec.
 
-## Project knowledge
+## Core guidelines
 
-### Tech stack
+- Keep workspace boundaries clean; prefer shared packages in `packages/*`.
+- Avoid deep relative imports across packages.
+- Avoid editing `apps/web/src/components/ui/` unless there is a bug or a clear requirement.
+- If requirements are unclear, state assumptions in the response and proceed.
 
-| Layer           | Technology          | Notes                          |
-| --------------- | ------------------- | ------------------------------ |
-| Frontend        | Next.js App Router  | `apps/web`                     |
-| Backend         | Elysia              | `apps/server`                  |
-| API             | tRPC                | `packages/api` + `/trpc`       |
-| Auth            | Better Auth         | `packages/auth` + `/api/auth`  |
-| Database        | PostgreSQL + Drizzle| `packages/db`                  |
-| Monorepo        | Turborepo + pnpm    | root `turbo.json` + workspaces |
+## Stack overview
 
-### Repository layout
+| Layer    | Technology           | Notes                          |
+| -------- | -------------------- | ------------------------------ |
+| Frontend | Next.js App Router   | `apps/web`                     |
+| Backend  | Elysia               | `apps/server`                  |
+| API      | tRPC                 | `packages/api` + `/trpc`       |
+| Auth     | Better Auth          | `packages/auth` + `/api/auth`  |
+| Database | PostgreSQL + Drizzle | `packages/db`                  |
+| Monorepo | Turborepo + pnpm     | root `turbo.json` + workspaces |
+
+## Repository layout
 
 ```
 apps/
@@ -43,67 +45,43 @@ packages/
 └── config/                   # Shared TS config
 ```
 
-### How the pieces coordinate
+## Baseline wiring (template)
 
-1. **Frontend → tRPC**
-   - `apps/web` uses `apps/web/src/lib/trpc.ts` to create a tRPC client.
-   - Requests go to `process.env.NEXT_PUBLIC_SERVER_URL + /trpc` with `credentials: "include"` so auth cookies are sent.
+- Web -> tRPC: `apps/web/src/lib/trpc.ts` calls `NEXT_PUBLIC_SERVER_URL + /trpc` with `credentials: "include"`.
+- Web -> Auth: `authClient` (client) and `authServer` (server) talk to Better Auth endpoints.
+- Server -> tRPC: `/trpc/*` uses `fetchRequestHandler` with `@vermithor/api`.
+- Server -> Auth: `/api/auth/*` uses `auth.handler` from `@vermithor/auth`.
+- Database: `packages/db` owns the schema; `packages/auth` uses `schema/auth.ts`.
+- Drizzle config: `packages/db/drizzle.config.ts` loads env from `apps/server/.env`.
+- Package scope is `@vermithor`.
 
-2. **Frontend → Auth**
-   - Client-side auth uses `authClient` from `apps/web/src/lib/auth/client.ts`.
-   - Server-side auth (RSC/API routes) uses `authServer` from `apps/web/src/lib/auth/server.ts`.
-   - Both clients talk to the backend Better Auth endpoints.
-
-3. **Backend → tRPC**
-   - `apps/server/src/index.ts` mounts `/trpc/*` and delegates to `@ciaran/api` via `fetchRequestHandler`.
-   - tRPC context is created by `packages/api/src/context.ts`, which calls `auth.api.getSession` to attach the session.
-   - `protectedProcedure` in `packages/api/src/index.ts` enforces authentication.
-
-4. **Backend → Auth**
-   - `/api/auth/*` is routed to `auth.handler` from `@ciaran/auth`.
-   - `packages/auth` configures Better Auth with a Drizzle adapter and the auth schema from `@ciaran/db`.
-
-5. **Database layer**
-   - `packages/db` owns the Drizzle schema and helpers (`createId`, `lifecycle_dates`).
-   - `packages/auth` uses the schema in `packages/db/src/schema/auth.ts`.
-   - Drizzle config (`packages/db/drizzle.config.ts`) loads env from `apps/server/.env`.
-
-### Runtime ports (defaults)
+## Runtime ports (defaults)
 
 - `apps/web` runs on Next.js default port `3000` (unless overridden).
 - `apps/server` listens on `3001` in `apps/server/src/index.ts`.
 
-## Commands you can use
-
-| Command             | Purpose                                    |
-| ------------------ | ------------------------------------------ |
-| `pnpm dev`         | Run all dev tasks (assumed always running) |
-| `pnpm build`       | Build all packages/apps                    |
-| `pnpm check-types` | Type-check all packages                    |
-| `pnpm db:push`     | Push Drizzle schema to DB                  |
-| `pnpm db:generate` | Generate Drizzle migrations                |
-| `pnpm db:migrate`  | Run migrations                             |
-| `pnpm db:studio`   | Open Drizzle Studio                        |
-
-## Conventions and boundaries
-
-### Path aliases
+## Path aliases
 
 - `apps/web` uses `~/` for `apps/web/src/*`.
 - `apps/server` uses `~/` for `apps/server/src/*`.
 
-### Workspace boundaries
+## Commands (pnpm)
 
-- Shared logic belongs in `packages/*` and should be consumed via `@ciaran/*`.
-- Avoid deep relative imports across packages.
+| Command            | Purpose                 |
+| ------------------ | ----------------------- |
+| `pnpm dev`         | Run all dev tasks       |
+| `pnpm build`       | Build all packages/apps |
+| `pnpm check-types` | Type-check all packages |
+| `pnpm db:push`     | Push Drizzle schema     |
+| `pnpm db:generate` | Generate migrations     |
+| `pnpm db:migrate`  | Run migrations          |
+| `pnpm db:studio`   | Open Drizzle Studio     |
 
 ## Environment variables
 
-These are the vars referenced in code and configuration:
-
 - `NEXT_PUBLIC_SERVER_URL` - Base URL for tRPC + auth from the web app.
 - `CORS_ORIGIN` - Allowed origin for the Elysia CORS config.
-- `DATABASE_URL` - PostgreSQL connection string (used by `@ciaran/db` and auth).
+- `DATABASE_URL` - PostgreSQL connection string (used by `@vermithor/db` and auth).
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` - OAuth provider configuration for Better Auth.
 - `BETTER_AUTH_SECRET` / `BETTER_AUTH_URL` - Better Auth core settings (per env examples).
 

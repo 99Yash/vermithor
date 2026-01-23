@@ -1,9 +1,9 @@
 export const siteConfig = {
-  name: 'pnpm turborepo template',
+  name: 'Vermithor',
   url: 'https://your-app.com',
   ogImage: 'https://your-app.com/og.png',
   description:
-    'A minimal and lovely monorepo template made by Yash. Next.js frontend, Elysia.js server. Better-auth authentication. Drizzle ORM database. TailwindCSS for styling. Shadcn/ui for components. TypeScript for type safety. Pnpm for package management. Turborepo for building and development. ',
+    'Vermithor turns a resume into durable, streaming career matches. Validate and parse once, fetch jobs safely, and explore results with filters and inline resume edits.',
   links: {
     x: 'https://x.com/YashGouravKar1',
     github: 'https://git.new/ygkr',
