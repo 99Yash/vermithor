@@ -10,11 +10,11 @@ import { siteConfig } from '~/lib/site';
 import { trpc } from '~/lib/trpc';
 
 const glowOrbs = [
-  'pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-linear-to-br from-amber-500/25 via-amber-300/10 to-transparent blur-3xl dark:from-amber-400/18 dark:via-amber-200/8',
-  'pointer-events-none absolute -right-32 -top-40 h-80 w-80 rounded-full bg-linear-to-bl from-stone-500/20 via-zinc-400/10 to-transparent blur-3xl dark:from-stone-400/12 dark:via-zinc-300/8',
-  'pointer-events-none absolute -bottom-32 -left-40 h-80 w-80 rounded-full bg-linear-to-tr from-amber-400/20 via-yellow-300/10 to-transparent blur-3xl dark:from-amber-300/14 dark:via-yellow-200/8',
-  'pointer-events-none absolute -bottom-40 -right-32 h-72 w-72 rounded-full bg-linear-to-tl from-neutral-500/18 via-stone-400/10 to-transparent blur-3xl dark:from-neutral-400/12 dark:via-stone-300/8',
-  'pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-96 w-96 rounded-full bg-linear-to-b from-amber-400/18 via-amber-300/8 to-transparent blur-3xl dark:from-amber-300/12 dark:via-amber-200/6',
+  'pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-linear-to-br from-amber-500/25 via-amber-300/10 to-transparent blur-3xl dark:from-amber-300/35 dark:via-amber-200/15 dark:to-transparent',
+  'pointer-events-none absolute -right-32 -top-40 h-80 w-80 rounded-full bg-linear-to-bl from-stone-500/20 via-zinc-400/10 to-transparent blur-3xl dark:from-zinc-400/22 dark:via-slate-300/12 dark:to-transparent',
+  'pointer-events-none absolute -bottom-32 -left-40 h-80 w-80 rounded-full bg-linear-to-tr from-amber-400/20 via-yellow-300/10 to-transparent blur-3xl dark:from-orange-300/30 dark:via-amber-200/12 dark:to-transparent',
+  'pointer-events-none absolute -bottom-40 -right-32 h-72 w-72 rounded-full bg-linear-to-tl from-neutral-500/18 via-stone-400/10 to-transparent blur-3xl dark:from-amber-300/18 dark:via-orange-200/10 dark:to-transparent',
+  'pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-96 w-96 rounded-full bg-linear-to-b from-amber-400/18 via-amber-300/8 to-transparent blur-3xl dark:from-amber-300/25 dark:via-amber-200/12 dark:to-transparent',
 ];
 
 const dragonSketchLines = [
@@ -130,10 +130,19 @@ const socialLinks = [
 ];
 
 const primaryCtaClass =
-  'group px-8 py-4 text-base font-semibold tracking-tight shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30';
-const secondaryCtaClass = 'px-8 py-4';
+  'group px-8 py-4 text-base font-semibold tracking-tight shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 dark:shadow-amber-500/30 dark:hover:shadow-amber-400/45';
+const secondaryCtaClass =
+  'px-8 py-4 dark:border-amber-200/30 dark:text-amber-100/90 dark:hover:border-amber-200/50';
 const sectionCardClass =
-  'rounded-3xl border border-border/60 bg-card/70 p-8 shadow-lg';
+  'rounded-3xl border border-border/60 bg-card/70 p-8 shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-500/10';
+const surfaceCardClass =
+  'rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/25';
+const surfacePanelClass =
+  'rounded-2xl border border-border/60 bg-background/60 px-4 py-3 text-xs text-muted-foreground dark:border-amber-200/10 dark:bg-slate-950/50 dark:text-amber-100/70';
+const stepBadgeClass =
+  'flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary dark:bg-amber-500/15 dark:text-amber-100/90';
+const miniStepBadgeClass =
+  'flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary dark:bg-amber-500/15 dark:text-amber-100/90';
 
 export function LandingClient() {
   const { data: session } = authClient.useSession();
@@ -162,7 +171,7 @@ export function LandingClient() {
         aria-hidden="true"
       >
         <g
-          className="text-amber-700/30 dark:text-amber-200/15"
+          className="text-amber-700/30 dark:text-amber-200/25"
           stroke="currentColor"
           strokeWidth="1.3"
           strokeLinecap="round"
@@ -184,7 +193,7 @@ export function LandingClient() {
           <div className="flex flex-col gap-6">
             <Badge
               variant="secondary"
-              className="w-fit border-amber-200/70 bg-amber-100/70 text-amber-900/80 dark:border-amber-200/20 dark:bg-amber-500/10 dark:text-amber-100/80"
+              className="w-fit border-amber-200/70 bg-amber-100/70 text-amber-900/80 shadow-sm shadow-amber-500/10 dark:border-amber-200/25 dark:bg-amber-500/15 dark:text-amber-100/90 dark:shadow-amber-500/25"
             >
               Resume → Career Matches
             </Badge>
@@ -219,10 +228,10 @@ export function LandingClient() {
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 dark:border-amber-200/10 dark:bg-slate-950/60 dark:text-amber-100/80">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70 dark:bg-emerald-300/70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 dark:bg-emerald-300" />
                 </span>
                 {statusText}
               </span>
@@ -230,10 +239,13 @@ export function LandingClient() {
             </div>
           </div>
           <div className="relative">
-            <div className="absolute -inset-6 rounded-[32px] bg-linear-to-br from-amber-500/15 via-transparent to-yellow-500/12 blur-xl" />
-            <div className="relative rounded-3xl border border-border/60 bg-card/80 p-6 shadow-2xl shadow-amber-500/10 backdrop-blur-sm">
+            <div className="absolute -inset-6 rounded-[32px] bg-linear-to-br from-amber-500/15 via-transparent to-yellow-500/12 blur-xl dark:from-amber-400/25 dark:via-transparent dark:to-amber-300/15 dark:blur-2xl" />
+            <div className="relative rounded-3xl border border-border/60 bg-card/80 p-6 shadow-2xl shadow-amber-500/10 backdrop-blur-sm dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-400/20">
               <div className="flex items-center justify-between">
-                <Badge variant="secondary" className="bg-secondary/70">
+                <Badge
+                  variant="secondary"
+                  className="bg-secondary/70 dark:border-amber-200/20 dark:bg-amber-500/10 dark:text-amber-100/80"
+                >
                   Live match stream
                 </Badge>
                 <span className="text-xs text-muted-foreground">
@@ -244,13 +256,13 @@ export function LandingClient() {
                 {streamItems.map((item) => (
                   <div
                     key={item.title}
-                    className="group rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                    className={surfaceCardClass}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-semibold">{item.title}</p>
                       <Badge
                         variant="outline"
-                        className="border-border/60 text-[10px] uppercase tracking-wide"
+                        className="border-border/60 text-[10px] uppercase tracking-wide dark:border-amber-200/20 dark:text-amber-100/80"
                       >
                         {item.status}
                       </Badge>
@@ -258,14 +270,14 @@ export function LandingClient() {
                     <p className="mt-2 text-xs text-muted-foreground">
                       {item.detail}
                     </p>
-                    <div className="mt-3 h-1 w-full rounded-full bg-muted">
-                      <div className="shimmer h-full w-2/3 rounded-full bg-linear-to-r from-amber-600/55 via-orange-500/45 to-amber-400/55" />
+                    <div className="mt-3 h-1 w-full rounded-full bg-muted dark:bg-amber-950/50">
+                      <div className="shimmer h-full w-2/3 rounded-full bg-linear-to-r from-amber-600/55 via-orange-500/45 to-amber-400/55 dark:from-amber-300/70 dark:via-amber-200/50 dark:to-orange-200/60" />
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-6 flex items-center gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3 text-xs text-muted-foreground">
-                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400/80" />
+              <div className={surfacePanelClass}>
+                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400/80 dark:bg-emerald-300/80" />
                 Results update as each analysis step completes.
               </div>
             </div>
@@ -287,12 +299,10 @@ export function LandingClient() {
             {workflowSteps.map((step, index) => (
               <div
                 key={step.title}
-                className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:hover:shadow-amber-500/25"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                    {`0${index + 1}`}
-                  </span>
+                  <span className={stepBadgeClass}>{`0${index + 1}`}</span>
                   <h3 className="text-lg font-semibold">{step.title}</h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
@@ -315,7 +325,7 @@ export function LandingClient() {
               {durabilityHighlights.map((item) => (
                 <div
                   key={item.title}
-                  className="rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                  className="rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/20"
                 >
                   <h4 className="text-sm font-semibold">{item.title}</h4>
                   <p className="mt-2 text-xs text-muted-foreground">
@@ -335,9 +345,9 @@ export function LandingClient() {
               {streamingHighlights.map((item) => (
                 <div
                   key={item.title}
-                  className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4"
+                  className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4 dark:border-amber-200/10 dark:bg-slate-950/55"
                 >
-                  <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80" />
+                  <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
                   <div>
                     <p className="text-sm font-semibold">{item.title}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
@@ -362,7 +372,7 @@ export function LandingClient() {
                 <Badge
                   key={chip}
                   variant="outline"
-                  className="bg-background/70"
+                  className="bg-background/70 dark:border-amber-200/20 dark:bg-slate-950/50 dark:text-amber-100/80"
                 >
                   {chip}
                 </Badge>
@@ -370,10 +380,7 @@ export function LandingClient() {
             </div>
             <div className="mt-6 grid gap-3 text-xs text-muted-foreground">
               {explorationSteps.map((step) => (
-                <div
-                  key={step}
-                  className="rounded-2xl border border-border/60 bg-background/60 px-4 py-3"
-                >
+                <div key={step} className={surfacePanelClass}>
                   {step}
                 </div>
               ))}
@@ -389,11 +396,9 @@ export function LandingClient() {
               {resumeSteps.map((step, index) => (
                 <div
                   key={step}
-                  className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3"
+                  className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3 dark:border-amber-200/10 dark:bg-slate-950/50"
                 >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                    {index + 1}
-                  </span>
+                  <span className={miniStepBadgeClass}>{index + 1}</span>
                   <p className="text-xs text-muted-foreground">{step}</p>
                 </div>
               ))}
@@ -401,7 +406,7 @@ export function LandingClient() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-border/60 bg-linear-to-br from-amber-500/12 via-transparent to-yellow-500/10 px-6 py-12 text-center shadow-lg sm:px-10">
+        <section className="rounded-3xl border border-border/60 bg-linear-to-br from-amber-500/12 via-transparent to-yellow-500/10 px-6 py-12 text-center shadow-lg dark:border-amber-200/10 dark:from-amber-400/20 dark:via-transparent dark:to-amber-200/12 dark:shadow-amber-500/15 sm:px-10">
           <h2 className="heading-md text-balance">
             Ready to stream your next matches?
           </h2>
@@ -429,7 +434,7 @@ export function LandingClient() {
           </div>
         </section>
 
-        <footer className="flex flex-col items-center gap-4 border-t border-border/60 pt-8 text-sm text-muted-foreground sm:flex-row sm:justify-between">
+        <footer className="flex flex-col items-center gap-4 border-t border-border/60 pt-8 text-sm text-muted-foreground dark:border-amber-200/10 sm:flex-row sm:justify-between">
           <span>{siteConfig.name} | Resume to career matches</span>
           <div className="flex items-center gap-4">
             {socialLinks.map((link) => {
