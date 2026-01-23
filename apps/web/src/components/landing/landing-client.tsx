@@ -47,66 +47,81 @@ const dragonSketchLines = [
 const streamItems = [
   {
     title: 'Design Systems Lead',
-    detail: 'Systems, accessibility, and UX leadership align.',
+    detail: 'Systems thinking, accessibility, UX leadership.',
     status: 'New',
   },
   {
     title: 'Senior Frontend Engineer',
-    detail: 'Frontend craft and UI architecture align.',
-    status: 'Analyzing',
+    detail: 'Frontend craft and UI architecture.',
+    status: 'In review',
   },
   {
     title: 'Product Engineer, Growth',
-    detail: 'Experimentation and metrics-driven delivery align.',
-    status: 'Ready',
+    detail: 'Experimentation and metrics-driven delivery.',
+    status: 'Matched',
+  },
+];
+
+const momentumHighlights = [
+  {
+    title: 'Focused profile',
+    description: 'We translate your résumé into a clear profile for matching.',
+  },
+  {
+    title: 'Live matching',
+    description: 'Roles stream in as soon as each stage finishes.',
+  },
+  {
+    title: 'Control built in',
+    description: 'Filter, search, and refine without losing your place.',
   },
 ];
 
 const workflowSteps = [
   {
     title: 'Upload',
-    description: 'Drop in your résumé. We take it from there.',
+    description: 'Start with your résumé.',
   },
   {
-    title: 'We learn your story',
-    description: 'Your experience becomes a clear, focused profile.',
+    title: 'Profile',
+    description: 'We map your strengths into a focused view.',
   },
   {
-    title: 'Find the fit',
-    description: 'We surface roles that match your strengths.',
+    title: 'Match',
+    description: 'Roles align to your goals and experience.',
   },
   {
-    title: 'Matches arrive',
-    description: 'New matches show up as soon as they are ready.',
+    title: 'Stream',
+    description: 'Matches arrive as soon as they are ready.',
   },
 ];
 
 const durabilityHighlights = [
   {
     title: 'Checkpointed stages',
-    description: 'Each stage saves state so work resumes smoothly.',
+    description: 'Progress persists so work resumes smoothly.',
   },
   {
-    title: 'Retry with backoff',
-    description: 'Automatic retries smooth over small hiccups.',
+    title: 'Smart retries',
+    description: 'Automatic retries handle small hiccups.',
   },
   {
     title: 'Independent queues',
-    description: 'Discovery and analysis run separately for stability.',
+    description: 'Discovery and analysis stay separate for stability.',
   },
 ];
 
 const streamingHighlights = [
   {
-    title: 'Live progress',
+    title: 'Progress in view',
     description: 'Queued → running → delivered stays visible.',
   },
   {
-    title: 'Streaming results',
+    title: 'Live by default',
     description: 'Matches stream in as each stage finishes.',
   },
   {
-    title: 'Structured output',
+    title: 'Organized output',
     description: 'Matches arrive organized for filtering and search.',
   },
 ];
@@ -114,15 +129,15 @@ const streamingHighlights = [
 const explorationChips = ['Filters', 'Sorts', 'Search', 'Pages'];
 
 const explorationSteps = [
-  'Dial in filters and sorts in a single view.',
-  'Results update instantly as you adjust.',
-  'Keep exploring without starting over.',
+  'One view for filters and sorts.',
+  'Results refresh as you tweak.',
+  'Keep exploring without a reset.',
 ];
 
 const resumeSteps = [
-  'Suggestions appear right in the editor.',
+  'Inline suggestions as you edit.',
   'Quick checks before you save.',
-  'Version snapshots to undo, compare, and rerun matches.',
+  'Snapshots to undo, compare, and rerun matches.',
 ];
 
 const socialLinks = [
@@ -138,6 +153,8 @@ const secondaryCtaClass =
   'px-8 py-4 dark:border-amber-200/30 dark:text-amber-100/90 dark:hover:border-amber-200/50';
 const sectionCardClass =
   'rounded-3xl border border-border/60 bg-card/70 p-8 shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-500/10';
+const featureCardClass =
+  'rounded-2xl border border-border/60 bg-card/60 p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/25';
 const surfaceCardClass =
   'rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/25';
 const surfacePanelClass =
@@ -160,7 +177,7 @@ export function LandingClient() {
       : 'Status: unavailable';
   const greeting = firstName
     ? `Welcome back, ${firstName}.`
-    : 'Always on. Always updating.';
+    : 'Always on. Always matching.';
 
   return (
     <div className="relative min-h-full overflow-hidden bg-background">
@@ -196,12 +213,12 @@ export function LandingClient() {
           <div className="flex flex-col gap-6">
             <div className="space-y-4">
               <h1 className="heading-xl text-balance">
-                Your résumé. <span className="text-gradient-brand">Jobs</span>{' '}
-                streaming in real time.
+                Job matches. <span className="text-gradient-brand">In</span>{' '}
+                real time.
               </h1>
               <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-                Upload once. We read it, learn your story, and surface roles
-                that fit.
+                Upload your résumé once. We build a focused profile and stream
+                roles that fit.
               </p>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -219,7 +236,7 @@ export function LandingClient() {
                 size="lg"
                 className={secondaryCtaClass}
               >
-                <Link href="#workflow">Learn how it works</Link>
+                <Link href="#workflow">See the flow</Link>
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -241,10 +258,10 @@ export function LandingClient() {
                   variant="secondary"
                   className="bg-secondary/70 dark:border-amber-200/20 dark:bg-amber-500/10 dark:text-amber-100/80"
                 >
-                  Live match feed
+                  Match stream
                 </Badge>
                 <span className="text-xs text-muted-foreground">
-                  Results, live
+                  Live results
                 </span>
               </div>
               <div className="mt-6 space-y-4">
@@ -270,21 +287,41 @@ export function LandingClient() {
               </div>
               <div className={surfacePanelClass}>
                 <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400/80 dark:bg-emerald-300/80" />
-                Updates arrive as each step finishes.
+                Updates land as each step finishes.
               </div>
             </div>
           </div>
         </section>
 
-        <section id="workflow" className="grid gap-8">
+        <section className="grid gap-8">
           <div className="flex flex-col gap-3">
-            <h2 className="heading-lg text-gradient-subtle">How it works</h2>
+            <h2 className="heading-lg text-gradient-subtle">
+              Designed for momentum
+            </h2>
             <p className="text-pretty text-base text-muted-foreground">
-              Upload your résumé. We learn your story. We find the fit. You
-              explore the best matches.
+              Everything stays crisp, fast, and moving forward.
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-3">
+            {momentumHighlights.map((item) => (
+              <div key={item.title} className={featureCardClass}>
+                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="workflow" className="grid gap-8">
+          <div className="flex flex-col gap-3">
+            <h2 className="heading-lg text-gradient-subtle">The flow</h2>
+            <p className="text-pretty text-base text-muted-foreground">
+              Four steps. Always moving.
+            </p>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {workflowSteps.map((step, index) => (
               <div
                 key={step.title}
@@ -303,64 +340,12 @@ export function LandingClient() {
           </div>
         </section>
 
-        <section className="grid gap-8">
-          <div className="flex flex-col gap-3">
-            <h2 className="heading-lg text-gradient-subtle">Under the hood</h2>
-            <p className="text-pretty text-base text-muted-foreground">
-              Quiet engineering that keeps everything reliable and fast.
-            </p>
-          </div>
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className={sectionCardClass}>
-              <h3 className="text-2xl font-semibold">Reliability, built in</h3>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Checkpointed stages and durable queues keep work moving.
-              </p>
-              <div className="mt-6 grid gap-4">
-                {durabilityHighlights.map((item) => (
-                  <div
-                    key={item.title}
-                    className="rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/20"
-                  >
-                    <h4 className="text-sm font-semibold">{item.title}</h4>
-                    <p className="mt-2 text-xs text-muted-foreground">
-                      {item.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className={sectionCardClass}>
-              <h3 className="text-2xl font-semibold">Streaming updates</h3>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Results arrive as they are ready, with progress visible.
-              </p>
-              <div className="mt-6 space-y-4">
-                {streamingHighlights.map((item) => (
-                  <div
-                    key={item.title}
-                    className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4 dark:border-amber-200/10 dark:bg-slate-950/55"
-                  >
-                    <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
-                    <div>
-                      <p className="text-sm font-semibold">{item.title}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="grid gap-6 lg:grid-cols-2">
           <div className={sectionCardClass}>
-            <h3 className="text-2xl font-semibold">Explore with confidence</h3>
+            <h3 className="text-2xl font-semibold">Explore with clarity</h3>
             <p className="mt-3 text-sm text-muted-foreground">
-              Filter, sort, search, and move through pages without losing your
-              place. Your choices stay put while you browse.
+              Filter, sort, search, and page without losing your place. Your
+              choices stay put.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {explorationChips.map((chip) => (
@@ -384,8 +369,8 @@ export function LandingClient() {
           <div className={sectionCardClass}>
             <h3 className="text-2xl font-semibold">Résumé, refined</h3>
             <p className="mt-3 text-sm text-muted-foreground">
-              Suggestions land in the editor so you can refine quickly, save
-              safely, and rerun matches.
+              Suggestions land in the editor. Refine quickly, save with
+              confidence, and rerun matches.
             </p>
             <div className="mt-6 grid gap-3">
               {resumeSteps.map((step, index) => (
@@ -401,13 +386,66 @@ export function LandingClient() {
           </div>
         </section>
 
+        <section className="grid gap-8">
+          <div className="flex flex-col gap-3">
+            <h2 className="heading-lg text-gradient-subtle">
+              Engineered for flow
+            </h2>
+            <p className="text-pretty text-base text-muted-foreground">
+              Quiet systems keep everything reliable and fast.
+            </p>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className={sectionCardClass}>
+              <h3 className="text-2xl font-semibold">Reliability, built in</h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Checkpointed stages and durable queues keep the pipeline moving.
+              </p>
+              <div className="mt-6 grid gap-4">
+                {durabilityHighlights.map((item) => (
+                  <div
+                    key={item.title}
+                    className="rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/20"
+                  >
+                    <h4 className="text-sm font-semibold">{item.title}</h4>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {item.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={sectionCardClass}>
+              <h3 className="text-2xl font-semibold">Live visibility</h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Results arrive as they are ready, with progress always visible.
+              </p>
+              <div className="mt-6 space-y-4">
+                {streamingHighlights.map((item) => (
+                  <div
+                    key={item.title}
+                    className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4 dark:border-amber-200/10 dark:bg-slate-950/55"
+                  >
+                    <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
+                    <div>
+                      <p className="text-sm font-semibold">{item.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="rounded-3xl border border-border/60 bg-linear-to-br from-amber-500/12 via-transparent to-yellow-500/10 px-6 py-12 text-center shadow-lg dark:border-amber-200/10 dark:from-amber-400/20 dark:via-transparent dark:to-amber-200/12 dark:shadow-amber-500/15 sm:px-10">
           <h2 className="heading-md text-balance">
-            Ready for your next matches?
+            Ready when you are.
           </h2>
           <p className="mt-4 text-pretty text-base text-muted-foreground">
-            Start with a résumé upload, watch the flow run, and explore matches
-            as they arrive.
+            Upload your résumé and watch the matches arrive in real time.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className={primaryCtaClass}>
@@ -424,7 +462,7 @@ export function LandingClient() {
               size="lg"
               className={secondaryCtaClass}
             >
-              <Link href="#workflow">Review the flow</Link>
+              <Link href="#workflow">See the flow</Link>
             </Button>
           </div>
         </section>
