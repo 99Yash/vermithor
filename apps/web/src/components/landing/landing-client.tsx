@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { GitHub, LinkedIn, Mail, X } from '~/components/ui/icons';
@@ -16,6 +17,13 @@ const glowOrbs = [
   'pointer-events-none absolute -bottom-40 -right-32 h-72 w-72 rounded-full bg-linear-to-tl from-neutral-500/18 via-stone-400/10 to-transparent blur-3xl dark:from-amber-300/18 dark:via-orange-200/10 dark:to-transparent',
   'pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-96 w-96 rounded-full bg-linear-to-b from-amber-400/18 via-amber-300/8 to-transparent blur-3xl dark:from-amber-300/25 dark:via-amber-200/12 dark:to-transparent',
 ];
+
+const streamLetters = Array.from('stream');
+const streamLetterStyle = (index: number) =>
+  ({
+    '--index': index,
+    '--offset': index - (streamLetters.length - 1) / 2,
+  }) as CSSProperties;
 
 const dragonSketchLines = [
   { d: 'M940 120 C900 90 850 95 810 135', opacity: 0.5 },
@@ -39,87 +47,82 @@ const dragonSketchLines = [
 const streamItems = [
   {
     title: 'Design Systems Lead',
-    detail: 'Strong overlap in systems, accessibility, and UX leadership.',
+    detail: 'Systems, accessibility, and UX leadership align.',
     status: 'New',
   },
   {
     title: 'Senior Frontend Engineer',
-    detail: 'TypeScript + UI architecture signals align with recent work.',
+    detail: 'Frontend craft and UI architecture align.',
     status: 'Analyzing',
   },
   {
     title: 'Product Engineer, Growth',
-    detail: 'Experimentation mindset + metrics-driven delivery match.',
+    detail: 'Experimentation and metrics-driven delivery align.',
     status: 'Ready',
   },
 ];
 
 const workflowSteps = [
   {
-    title: 'Upload + validate',
-    description:
-      'Choose a résumé file. We validate format and size before parsing.',
+    title: 'Upload',
+    description: 'Drop in your résumé. We take it from there.',
   },
   {
-    title: 'Parse + extract profile',
-    description:
-      'We read the résumé and extract roles, skills, and signals into a profile.',
+    title: 'We learn your story',
+    description: 'Your experience becomes a clear, focused profile.',
   },
   {
-    title: 'Durable job fetch',
-    description:
-      'A queued workflow fetches jobs, retries safely, and never loses state.',
+    title: 'Find the fit',
+    description: 'We surface roles that match your strengths.',
   },
   {
-    title: 'Analyze + stream results',
-    description:
-      'Analysis runs and streams results into your UI as they are ready.',
+    title: 'Matches arrive',
+    description: 'New matches show up as soon as they are ready.',
   },
 ];
 
 const durabilityHighlights = [
   {
-    title: 'Retry-safe by default',
-    description: 'Failures resume at the right stage with backoff built in.',
+    title: 'Checkpointed stages',
+    description: 'Each stage saves state so work resumes smoothly.',
   },
   {
-    title: 'Streaming-first UI',
-    description: 'Progressive rendering replaces polling and long waits.',
+    title: 'Retry with backoff',
+    description: 'Automatic retries smooth over small hiccups.',
   },
   {
-    title: 'Separated queues',
-    description:
-      'Job discovery and analysis run independently for reliability.',
+    title: 'Independent queues',
+    description: 'Discovery and analysis run separately for stability.',
   },
 ];
 
 const streamingHighlights = [
   {
     title: 'Live progress',
-    description: 'Queued to running to rendered stays visible as you watch.',
+    description: 'Queued → running → delivered stays visible.',
   },
   {
-    title: 'Durable checkpoints',
-    description: 'Each stage persists so you can resume without rework.',
+    title: 'Streaming results',
+    description: 'Matches stream in as each stage finishes.',
   },
   {
-    title: 'Results explore-ready',
-    description: 'Matches arrive structured for filters, sort, and search.',
+    title: 'Structured output',
+    description: 'Matches arrive organized for filtering and search.',
   },
 ];
 
-const explorationChips = ['Filters', 'Sorts', 'Keyword search', 'Pagination'];
+const explorationChips = ['Filters', 'Sorts', 'Search', 'Pages'];
 
 const explorationSteps = [
-  'Filters, sorts, and pagination build a clean query state.',
-  'Query updates trigger a read-only fetch with no accidental writes.',
-  'Results render, then you keep exploring from the same flow.',
+  'Dial in filters and sorts in a single view.',
+  'Results update instantly as you adjust.',
+  'Keep exploring without starting over.',
 ];
 
 const resumeSteps = [
-  'Stream suggestions directly into the editor.',
-  'Validate edits before saving to prevent regressions.',
-  'Snapshot versions for undo, compare, and re-run matches.',
+  'Suggestions appear right in the editor.',
+  'Quick checks before you save.',
+  'Version snapshots to undo, compare, and rerun matches.',
 ];
 
 const socialLinks = [
@@ -151,13 +154,13 @@ export function LandingClient() {
   );
   const firstName = session?.user?.name?.split(' ')[0];
   const statusText = isLoading
-    ? 'Checking system status...'
+    ? 'Checking status...'
     : healthCheck
-      ? `System status: ${healthCheck}`
-      : 'System status: unavailable';
+      ? `Status: ${healthCheck}`
+      : 'Status: unavailable';
   const greeting = firstName
     ? `Welcome back, ${firstName}.`
-    : 'Durable workflows with streaming results.';
+    : 'Always on. Always updating.';
 
   return (
     <div className="relative min-h-full overflow-hidden bg-background">
@@ -195,18 +198,16 @@ export function LandingClient() {
               variant="secondary"
               className="w-fit border-amber-200/70 bg-amber-100/70 text-amber-900/80 shadow-sm shadow-amber-500/10 dark:border-amber-200/25 dark:bg-amber-500/15 dark:text-amber-100/90 dark:shadow-amber-500/25"
             >
-              Résumé → Career Matches
+              Résumé to matches
             </Badge>
             <div className="space-y-4">
               <h1 className="heading-xl text-balance">
-                Turn your résumé into{' '}
-                <span className="text-gradient-brand">career matches</span>{' '}
-                streaming in real time.
+                Your résumé. <span className="text-gradient-brand">Jobs</span>{' '}
+                streaming real time.
               </h1>
               <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-                Upload once. We validate, parse, and extract a profile. A
-                durable workflow fetches jobs, analyzes fit, and streams results
-                the moment they are ready.
+                Upload once. We read it, learn your story, and surface roles
+                that fit.
               </p>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -224,7 +225,7 @@ export function LandingClient() {
                 size="lg"
                 className={secondaryCtaClass}
               >
-                <Link href="#workflow">See the workflow</Link>
+                <Link href="#workflow">Learn how it works</Link>
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
@@ -246,10 +247,10 @@ export function LandingClient() {
                   variant="secondary"
                   className="bg-secondary/70 dark:border-amber-200/20 dark:bg-amber-500/10 dark:text-amber-100/80"
                 >
-                  Live match stream
+                  Live match feed
                 </Badge>
                 <span className="text-xs text-muted-foreground">
-                  Streaming results
+                  Results, live
                 </span>
               </div>
               <div className="mt-6 space-y-4">
@@ -275,7 +276,7 @@ export function LandingClient() {
               </div>
               <div className={surfacePanelClass}>
                 <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400/80 dark:bg-emerald-300/80" />
-                Results update as each analysis step completes.
+                Updates arrive as each step finishes.
               </div>
             </div>
           </div>
@@ -283,13 +284,10 @@ export function LandingClient() {
 
         <section id="workflow" className="grid gap-8">
           <div className="flex flex-col gap-3">
-            <h2 className="heading-lg text-gradient-subtle">
-              Workflow built for momentum
-            </h2>
+            <h2 className="heading-lg text-gradient-subtle">How it works</h2>
             <p className="text-pretty text-base text-muted-foreground">
-              The experience follows a clear state machine: validate the résumé,
-              parse and extract a profile, queue durable job fetches, then
-              stream analysis into results you can explore.
+              Upload your résumé. We learn your story. We find the fit. You
+              explore the best matches.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2">
@@ -311,58 +309,64 @@ export function LandingClient() {
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className={sectionCardClass}>
-            <h3 className="text-2xl font-semibold">Durable by design</h3>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Every step is designed to resume safely. Failures retry with
-              backoff, and streaming keeps the UI alive while work continues.
+        <section className="grid gap-8">
+          <div className="flex flex-col gap-3">
+            <h2 className="heading-lg text-gradient-subtle">Under the hood</h2>
+            <p className="text-pretty text-base text-muted-foreground">
+              Quiet engineering that keeps everything reliable and fast.
             </p>
-            <div className="mt-6 grid gap-4">
-              {durabilityHighlights.map((item) => (
-                <div
-                  key={item.title}
-                  className="rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/20"
-                >
-                  <h4 className="text-sm font-semibold">{item.title}</h4>
-                  <p className="mt-2 text-xs text-muted-foreground">
-                    {item.description}
-                  </p>
-                </div>
-              ))}
-            </div>
           </div>
-          <div className={sectionCardClass}>
-            <h3 className="text-2xl font-semibold">Stream-first experience</h3>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Progress stays visible as results stream, keeping momentum while
-              analysis runs.
-            </p>
-            <div className="mt-6 space-y-4">
-              {streamingHighlights.map((item) => (
-                <div
-                  key={item.title}
-                  className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4 dark:border-amber-200/10 dark:bg-slate-950/55"
-                >
-                  <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
-                  <div>
-                    <p className="text-sm font-semibold">{item.title}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className={sectionCardClass}>
+              <h3 className="text-2xl font-semibold">Reliability, built in</h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Checkpointed stages and durable queues keep work moving.
+              </p>
+              <div className="mt-6 grid gap-4">
+                {durabilityHighlights.map((item) => (
+                  <div
+                    key={item.title}
+                    className="rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/20"
+                  >
+                    <h4 className="text-sm font-semibold">{item.title}</h4>
+                    <p className="mt-2 text-xs text-muted-foreground">
                       {item.description}
                     </p>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+            <div className={sectionCardClass}>
+              <h3 className="text-2xl font-semibold">Streaming updates</h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Results arrive as they are ready, with progress visible.
+              </p>
+              <div className="mt-6 space-y-4">
+                {streamingHighlights.map((item) => (
+                  <div
+                    key={item.title}
+                    className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4 dark:border-amber-200/10 dark:bg-slate-950/55"
+                  >
+                    <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
+                    <div>
+                      <p className="text-sm font-semibold">{item.title}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">
           <div className={sectionCardClass}>
-            <h3 className="text-2xl font-semibold">Results exploration</h3>
+            <h3 className="text-2xl font-semibold">Explore with confidence</h3>
             <p className="mt-3 text-sm text-muted-foreground">
-              Filter, sort, search, and paginate without losing the thread. Your
-              query state stays clean and read-only.
+              Filter, sort, search, and move through pages without losing your
+              place. Your choices stay put while you browse.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {explorationChips.map((chip) => (
@@ -384,10 +388,10 @@ export function LandingClient() {
             </div>
           </div>
           <div className={sectionCardClass}>
-            <h3 className="text-2xl font-semibold">Résumé improvement loop</h3>
+            <h3 className="text-2xl font-semibold">Résumé, refined</h3>
             <p className="mt-3 text-sm text-muted-foreground">
-              Suggestions stream into the editor so you can refine quickly, save
-              safely, and re-run matches when you are ready.
+              Suggestions land in the editor so you can refine quickly, save
+              safely, and rerun matches.
             </p>
             <div className="mt-6 grid gap-3">
               {resumeSteps.map((step, index) => (
@@ -405,11 +409,11 @@ export function LandingClient() {
 
         <section className="rounded-3xl border border-border/60 bg-linear-to-br from-amber-500/12 via-transparent to-yellow-500/10 px-6 py-12 text-center shadow-lg dark:border-amber-200/10 dark:from-amber-400/20 dark:via-transparent dark:to-amber-200/12 dark:shadow-amber-500/15 sm:px-10">
           <h2 className="heading-md text-balance">
-            Ready to stream your next matches?
+            Ready for your next matches?
           </h2>
           <p className="mt-4 text-pretty text-base text-muted-foreground">
-            Start with a résumé upload, watch the workflow run, and explore
-            matches as they arrive.
+            Start with a résumé upload, watch the flow run, and explore matches
+            as they arrive.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className={primaryCtaClass}>
@@ -426,13 +430,13 @@ export function LandingClient() {
               size="lg"
               className={secondaryCtaClass}
             >
-              <Link href="#workflow">Revisit the workflow</Link>
+              <Link href="#workflow">Review the flow</Link>
             </Button>
           </div>
         </section>
 
         <footer className="flex flex-col items-center gap-4 border-t border-border/60 pt-8 text-sm text-muted-foreground dark:border-amber-200/10 sm:flex-row sm:justify-between">
-          <span>{siteConfig.name} | Résumé to career matches</span>
+          <span>{siteConfig.name} | Résumé to matches</span>
           <div className="flex items-center gap-4">
             {socialLinks.map((link) => {
               const Icon = link.icon;
