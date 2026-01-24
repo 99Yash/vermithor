@@ -117,8 +117,6 @@ const trustMarks = [
 
 const primaryCtaClass =
   'group px-8 py-4 text-base font-semibold tracking-tight shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 dark:shadow-amber-500/30 dark:hover:shadow-amber-400/45';
-const secondaryCtaClass =
-  'px-8 py-4 text-base font-semibold tracking-tight';
 const sectionCardClass =
   'rounded-3xl border border-border/50 bg-background/70 p-8 shadow-sm dark:border-amber-200/10 dark:bg-slate-950/55';
 const featureCardClass =
@@ -205,21 +203,6 @@ export function LandingClient() {
               {siteConfig.name}
             </span>
           </Link>
-          <div className="flex items-center gap-3">
-            {!session?.user ? (
-              <Button asChild variant="outline" className={secondaryCtaClass}>
-                <Link href="/signin">Sign in</Link>
-              </Button>
-            ) : null}
-            <Button asChild size="lg" className={primaryCtaClass}>
-              <Link href="/signin">
-                Get started
-                <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-            </Button>
-          </div>
         </header>
 
         <section className="mx-auto flex max-w-5xl flex-col items-center gap-8 text-center lg:gap-10">
@@ -244,9 +227,6 @@ export function LandingClient() {
                   →
                 </span>
               </Link>
-            </Button>
-            <Button asChild variant="outline" className={secondaryCtaClass}>
-              <a href={`mailto:${siteConfig.links.mail}`}>Request demo</a>
             </Button>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
