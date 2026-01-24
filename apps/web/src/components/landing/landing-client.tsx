@@ -138,7 +138,9 @@ const featureCardClass =
 const surfaceCardClass =
   'rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/25';
 const surfacePanelClass =
-  'rounded-2xl border border-border/60 bg-background/60 px-4 py-3 text-xs text-muted-foreground dark:border-amber-200/10 dark:bg-slate-950/50 dark:text-amber-100/70';
+  'rounded-2xl border border-border/60 bg-background/60 px-4 py-3 text-[13.5px] font-medium tracking-tight text-muted-foreground dark:border-amber-200/10 dark:bg-slate-950/50 dark:text-amber-100/70';
+const smallDescriptionClass =
+  'text-[13.5px] font-medium tracking-tight text-muted-foreground';
 const stepBadgeClass =
   'flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary dark:bg-amber-500/15 dark:text-amber-100/90';
 const miniStepBadgeClass =
@@ -164,11 +166,14 @@ export function LandingClient() {
     : 'Always on. Always matching.';
 
   return (
-    <div className="relative min-h-full overflow-hidden bg-background">
-      {glowOrbs.map((className, index) => (
-        <div key={`glow-${index}`} className={className} aria-hidden="true" />
-      ))}
-      <DragonLines className="opacity-80" />
+    <div className="relative min-h-full bg-background">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        {glowOrbs.map((className, index) => (
+          <div key={`glow-${index}`} className={className} aria-hidden="true" />
+        ))}
+        <DragonLines className="opacity-80" />
+        <DragonLines className="top-auto bottom-[-180px] opacity-70" />
+      </div>
 
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-20 px-6 pb-20 pt-16 lg:px-10">
         <section className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
@@ -230,7 +235,7 @@ export function LandingClient() {
                         {item.status}
                       </Badge>
                     </div>
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className={`mt-2 ${smallDescriptionClass}`}>
                       {item.detail}
                     </p>
                     <div className="mt-3 h-1 w-full rounded-full bg-muted dark:bg-amber-950/50">
@@ -268,7 +273,7 @@ export function LandingClient() {
           </div>
         </section>
 
-        <section id="workflow" className="grid gap-8">
+        <section id="workflow" className="grid gap-8 scroll-mt-24">
           <div className="flex flex-col gap-3">
             <h2 className="heading-lg text-gradient-subtle">The flow</h2>
             <p className="text-pretty text-base text-muted-foreground">
@@ -333,7 +338,7 @@ export function LandingClient() {
                   className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3 dark:border-amber-200/10 dark:bg-slate-950/50"
                 >
                   <span className={miniStepBadgeClass}>{index + 1}</span>
-                  <p className="text-xs text-muted-foreground">{step}</p>
+                  <p className={smallDescriptionClass}>{step}</p>
                 </div>
               ))}
             </div>
@@ -362,7 +367,7 @@ export function LandingClient() {
                     className="rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/20"
                   >
                     <h4 className="text-sm font-semibold">{item.title}</h4>
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className={`mt-2 ${smallDescriptionClass}`}>
                       {item.description}
                     </p>
                   </div>
@@ -383,7 +388,7 @@ export function LandingClient() {
                     <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
                     <div>
                       <p className="text-sm font-semibold">{item.title}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
+                      <p className={`mt-1 ${smallDescriptionClass}`}>
                         {item.description}
                       </p>
                     </div>
@@ -411,29 +416,65 @@ export function LandingClient() {
           </div>
         </section>
 
-        <footer className="flex flex-col items-center gap-4 border-t border-border/60 pt-8 text-sm text-muted-foreground dark:border-amber-200/10 sm:flex-row sm:justify-between">
-          <span>{siteConfig.name} | Résumé to matches</span>
-          <div className="flex items-center gap-4">
-            {socialLinks.map((link) => {
-              const Icon = link.icon;
-              const isExternal = link.href.startsWith('http');
+        <footer className="grid gap-8 border-t border-border/60 pt-8 text-sm text-muted-foreground dark:border-amber-200/10 sm:grid-cols-[1.1fr_0.9fr]">
+          <div className="flex flex-col gap-4 text-center sm:text-left">
+            <div className="flex flex-col items-center gap-3 sm:flex-row">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 shadow-sm dark:border-amber-200/20 dark:bg-slate-950/60">
+                <img
+                  src="/favicon.svg"
+                  alt={`${siteConfig.name} mark`}
+                  className="h-6 w-6 opacity-90"
+                />
+              </div>
+              <div className="space-y-1">
+                <p className="text-base font-semibold text-foreground">
+                  {siteConfig.name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Résumé to matches.
+                </p>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Focused profiles in, live matches out—built for momentum.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-4 sm:items-end">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-muted-foreground sm:justify-end">
+              <a
+                href="#workflow"
+                className="transition-colors hover:text-foreground"
+              >
+                Workflow
+              </a>
+              <Link
+                href="/signin"
+                className="transition-colors hover:text-foreground"
+              >
+                Sign in
+              </Link>
+            </div>
+            <div className="flex items-center gap-4">
+              {socialLinks.map((link) => {
+                const Icon = link.icon;
+                const isExternal = link.href.startsWith('http');
 
-              return (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  target={isExternal ? '_blank' : undefined}
-                  rel={isExternal ? 'noopener noreferrer' : undefined}
-                  className="group flex items-center gap-2 transition-colors hover:text-foreground"
-                >
-                  <Icon className="h-5 w-5 transition-transform group-hover:scale-110" />
-                </a>
-              );
-            })}
+                return (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target={isExternal ? '_blank' : undefined}
+                    rel={isExternal ? 'noopener noreferrer' : undefined}
+                    className="group flex items-center gap-2 transition-colors hover:text-foreground"
+                  >
+                    <Icon className="h-5 w-5 transition-transform group-hover:scale-110" />
+                  </a>
+                );
+              })}
+            </div>
           </div>
         </footer>
       </main>
-      <DragonLines className="top-auto bottom-[-180px] opacity-70" />
     </div>
   );
 }
