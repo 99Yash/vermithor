@@ -10,15 +10,11 @@ import { siteConfig } from '~/lib/site';
 import { trpc } from '~/lib/trpc';
 
 const glowOrbs = [
-  'pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-linear-to-br from-amber-500/25 via-amber-300/10 to-transparent blur-3xl dark:from-amber-300/35 dark:via-amber-200/15 dark:to-transparent',
-  'pointer-events-none absolute -right-32 -top-40 h-80 w-80 rounded-full bg-linear-to-bl from-stone-500/20 via-zinc-400/10 to-transparent blur-3xl dark:from-zinc-400/22 dark:via-slate-300/12 dark:to-transparent',
-  'pointer-events-none absolute -bottom-32 -left-40 h-80 w-80 rounded-full bg-linear-to-tr from-amber-400/20 via-yellow-300/10 to-transparent blur-3xl dark:from-orange-300/30 dark:via-amber-200/12 dark:to-transparent',
-  'pointer-events-none absolute -bottom-40 -right-32 h-72 w-72 rounded-full bg-linear-to-tl from-neutral-500/18 via-stone-400/10 to-transparent blur-3xl dark:from-amber-300/18 dark:via-orange-200/10 dark:to-transparent',
-  'pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-96 w-96 rounded-full bg-linear-to-b from-amber-400/18 via-amber-300/8 to-transparent blur-3xl dark:from-amber-300/25 dark:via-amber-200/12 dark:to-transparent',
-];
-const bottomGlowOrbs = [
-  'pointer-events-none absolute -bottom-56 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-linear-to-t from-amber-500/20 via-amber-300/10 to-transparent blur-3xl dark:from-amber-300/25 dark:via-amber-200/12',
-  'pointer-events-none absolute -bottom-48 right-[-10%] h-80 w-80 rounded-full bg-linear-to-tl from-stone-400/18 via-zinc-300/10 to-transparent blur-3xl dark:from-amber-200/16 dark:via-amber-100/10',
+  'pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-linear-to-br from-stone-400/14 via-stone-300/6 to-transparent blur-3xl dark:from-slate-400/12 dark:via-slate-300/6 dark:to-transparent',
+  'pointer-events-none absolute -right-32 -top-40 h-80 w-80 rounded-full bg-linear-to-bl from-stone-500/16 via-zinc-400/8 to-transparent blur-3xl dark:from-zinc-400/16 dark:via-slate-300/8 dark:to-transparent',
+  'pointer-events-none absolute -bottom-32 -left-40 h-80 w-80 rounded-full bg-linear-to-tr from-amber-400/10 via-stone-300/6 to-transparent blur-3xl dark:from-amber-200/8 dark:via-slate-300/6 dark:to-transparent',
+  'pointer-events-none absolute -bottom-40 -right-32 h-72 w-72 rounded-full bg-linear-to-tl from-neutral-500/12 via-stone-400/6 to-transparent blur-3xl dark:from-stone-300/10 dark:via-slate-300/6 dark:to-transparent',
+  'pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-96 w-96 rounded-full bg-linear-to-b from-amber-300/10 via-amber-200/5 to-transparent blur-3xl dark:from-amber-200/8 dark:via-amber-100/4 dark:to-transparent',
 ];
 
 const featureHighlights = [
@@ -28,7 +24,8 @@ const featureHighlights = [
   },
   {
     title: 'Live matching',
-    description: 'Matches arrive as each stage finishes, not in a nightly batch.',
+    description:
+      'Matches arrive as each stage finishes, not in a nightly batch.',
   },
   {
     title: 'Curated control',
@@ -59,7 +56,8 @@ const detailBlocks = [
   {
     eyebrow: 'Explore with clarity',
     title: 'Everything you need to compare roles, in one view.',
-    description: 'Filters, notes, and saved views stay pinned as the stream updates.',
+    description:
+      'Filters, notes, and saved views stay pinned as the stream updates.',
     items: [
       'Single view for filters and notes.',
       'Results refresh as you refine.',
@@ -130,9 +128,9 @@ const stepBadgeClass =
 const miniStepBadgeClass =
   'flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary dark:bg-amber-500/15 dark:text-amber-100/90';
 const serifDisplayClass =
-  "font-['Perfectly_Nineties',serif] font-normal tracking-[-0.05em]";
+  "font-['Perfectly_Nineties',serif] font-normal tracking-[-0.06em]";
 const serifSectionClass =
-  "font-['Perfectly_Nineties',serif] font-normal tracking-[-0.03em]";
+  "font-['Perfectly_Nineties',serif] font-normal tracking-[-0.06em]";
 const eyebrowClass =
   'text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground';
 const tagClass =
@@ -143,6 +141,12 @@ const heroDescriptionClass =
 const sectionTitleClass = `text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.05] ${serifSectionClass}`;
 const sectionDescriptionClass =
   'mx-auto max-w-2xl text-pretty text-base text-muted-foreground';
+const finaleGlowClass =
+  'pointer-events-none absolute left-1/2 top-[-40%] h-[180%] w-[150%] -translate-x-1/2 rounded-[999px] bg-linear-to-b from-stone-400/10 via-stone-300/4 to-transparent blur-3xl opacity-60 dark:from-slate-400/8 dark:via-slate-300/3 dark:opacity-30';
+const ctaPanelClass =
+  'relative isolate flex flex-col items-center gap-4 py-12 text-center sm:py-14';
+const ctaOrbClass =
+  'pointer-events-none absolute left-1/2 top-1/2 -z-10 h-56 w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-b from-stone-400/8 via-stone-300/4 to-transparent blur-3xl opacity-60 dark:from-slate-400/7 dark:via-slate-300/3 dark:opacity-30';
 
 const SectionHeader = ({
   eyebrow,
@@ -180,7 +184,7 @@ export function LandingClient() {
     : 'Curated matches, always in motion.';
 
   return (
-    <div className="relative min-h-full bg-background">
+    <div className="relative min-h-full bg-background" data-landing-root>
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         {glowOrbs.map((className, index) => (
           <div key={`glow-${index}`} className={className} aria-hidden="true" />
@@ -192,7 +196,7 @@ export function LandingClient() {
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-28 px-6 pb-20 pt-12 lg:px-10">
         <header className="flex items-center justify-between gap-6">
           <Link href="/" className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 shadow-sm dark:border-amber-200/20 dark:bg-slate-950/60">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background/70 shadow-sm dark:border-amber-200/20 dark:bg-slate-950/60">
               <img
                 src="/favicon.svg"
                 alt={`${siteConfig.name} mark`}
@@ -214,9 +218,8 @@ export function LandingClient() {
               The matching workspace for focused career moves.
             </h1>
             <p className={heroDescriptionClass}>
-              Upload your résumé, set your focus, and let Vermithor stream roles
-              as each stage completes. Everything is transparent, easy to
-              compare, and ready to act on.
+              Save thousands of hours searching and applying to roles you don't
+              fit.
             </p>
           </div>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -239,24 +242,7 @@ export function LandingClient() {
             </span>
             <span>{greeting}</span>
           </div>
-          <div className="space-y-3 text-xs text-muted-foreground">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-              Trusted by focused teams and solo builders
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {trustMarks.map((mark) => (
-                <span key={mark} className={tagClass}>
-                  {mark}
-                </span>
-              ))}
-            </div>
-          </div>
         </section>
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10">
-          {bottomGlowOrbs.map((className, index) => (
-            <div key={`glow-bottom-${index}`} className={className} />
-          ))}
-        </div>
 
         <section id="momentum" className="grid gap-10 scroll-mt-24">
           <SectionHeader
@@ -267,9 +253,7 @@ export function LandingClient() {
           <div className="grid gap-6 md:grid-cols-3">
             {featureHighlights.map((item) => (
               <div key={item.title} className={featureCardClass}>
-                <h3 className={`text-xl ${serifSectionClass}`}>
-                  {item.title}
-                </h3>
+                <h3 className={`text-xl ${serifSectionClass}`}>{item.title}</h3>
                 <p className="mt-3 text-sm text-muted-foreground">
                   {item.description}
                 </p>
@@ -282,7 +266,7 @@ export function LandingClient() {
           <SectionHeader
             eyebrow="The flow"
             title="Four steps, always in motion."
-            description="From résumé to matches in a steady stream."
+            description="From resume to matches in a steady stream."
           />
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {workflowSteps.map((step, index) => (
@@ -309,9 +293,7 @@ export function LandingClient() {
           {detailBlocks.map((block) => (
             <div key={block.title} className={sectionCardClass}>
               <p className={eyebrowClass}>{block.eyebrow}</p>
-              <h3
-                className={`mt-3 text-2xl text-balance ${serifSectionClass}`}
-              >
+              <h3 className={`mt-3 text-2xl text-balance ${serifSectionClass}`}>
                 {block.title}
               </h3>
               <p className="mt-3 text-sm text-muted-foreground">
@@ -363,84 +345,71 @@ export function LandingClient() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-border/60 bg-linear-to-br from-amber-500/12 via-transparent to-yellow-500/10 px-6 py-12 text-center shadow-lg dark:border-amber-200/10 dark:from-amber-400/20 dark:via-transparent dark:to-amber-200/12 dark:shadow-amber-500/15 sm:px-10">
-          <h2 className={`heading-md text-balance ${serifSectionClass}`}>
-            Ready to see the stream?
-          </h2>
-          <p className="mt-4 text-pretty text-base text-muted-foreground">
-            Start with a focused profile, then let the matching run in the
-            background.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" className={primaryCtaClass}>
-              <Link href="/signin">
-                Get started
-                <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-            </Button>
-          </div>
-        </section>
-
-        <footer className="grid gap-8 border-t border-border/60 pt-8 text-sm text-muted-foreground dark:border-amber-200/10 sm:grid-cols-[1.1fr_0.9fr]">
-          <div className="flex flex-col gap-4 text-center sm:text-left">
-            <div className="flex flex-col items-center gap-3 sm:flex-row">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 shadow-sm dark:border-amber-200/20 dark:bg-slate-950/60">
-                <img
-                  src="/favicon.svg"
-                  alt={`${siteConfig.name} mark`}
-                  className="h-6 w-6 opacity-90"
-                />
-              </div>
-              <div className="space-y-1">
-                <p className="text-base font-semibold text-foreground">
-                  {siteConfig.name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Profiles to matches.
-                </p>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Calm matching, deliberate moves.
+        <div className="relative isolate flex flex-col gap-10">
+          <div aria-hidden="true" className={finaleGlowClass} />
+          <section className={ctaPanelClass}>
+            <div aria-hidden="true" className={ctaOrbClass} />
+            <h2 className={`heading-md text-balance ${serifSectionClass}`}>
+              Ready for your next adventure?
+            </h2>
+            <p className="mt-4 text-pretty text-base text-muted-foreground">
+              Start with a focused profile, then let the matching run in the
+              background.
             </p>
-          </div>
-          <div className="flex flex-col items-center gap-4 sm:items-end">
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-muted-foreground sm:justify-end">
-              <a
-                href="#workflow"
-                className="transition-colors hover:text-foreground"
-              >
-                Workflow
-              </a>
-              <Link
-                href="/signin"
-                className="transition-colors hover:text-foreground"
-              >
-                Sign in
-              </Link>
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Button asChild size="lg" className={primaryCtaClass}>
+                <Link href="/signin">
+                  Get started
+                  <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </Link>
+              </Button>
             </div>
-            <div className="flex items-center gap-4">
-              {socialLinks.map((link) => {
-                const Icon = link.icon;
-                const isExternal = link.href.startsWith('http');
+          </section>
 
-                return (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    target={isExternal ? '_blank' : undefined}
-                    rel={isExternal ? 'noopener noreferrer' : undefined}
-                    className="group flex items-center gap-2 transition-colors hover:text-foreground"
-                  >
-                    <Icon className="h-5 w-5 transition-transform group-hover:scale-110" />
-                  </a>
-                );
-              })}
+          <footer className="relative grid gap-8 border-t border-border/60 pt-8 text-sm text-muted-foreground dark:border-amber-200/10 sm:grid-cols-[1.1fr_0.9fr]">
+            <div className="relative z-10 flex flex-col gap-4 text-center sm:text-left">
+              <div className="flex flex-col items-center gap-3 sm:flex-row">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background/70 shadow-sm dark:border-amber-200/20 dark:bg-slate-950/60">
+                  <img
+                    src="/favicon.svg"
+                    alt={`${siteConfig.name} mark`}
+                    className="h-6 w-6 opacity-90"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-base font-semibold text-foreground">
+                    {siteConfig.name}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Calm matching, deliberate moves.
+              </p>
             </div>
-          </div>
-        </footer>
+            <div className="relative z-10 flex flex-col items-center gap-4 sm:items-end">
+              <div className="flex items-center gap-4">
+                {socialLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isExternal = link.href.startsWith('http');
+
+                  return (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target={isExternal ? '_blank' : undefined}
+                      rel={isExternal ? 'noopener noreferrer' : undefined}
+                      className="group flex items-center gap-2 transition-colors hover:text-foreground"
+                    >
+                      <Icon className="h-5 w-5 transition-transform group-hover:scale-110" />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          </footer>
+        </div>
       </main>
     </div>
   );

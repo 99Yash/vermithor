@@ -207,6 +207,7 @@
     text-wrap: pretty;
   }
 
+
   /* Subtle glow effects */
   .glow-text {
     @apply drop-shadow-[0_0_15px_rgba(217,119,6,0.18)];
@@ -275,5 +276,18 @@
   /* Better focus states */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+}
+
+@layer utilities {
+  @media (min-width: 1024px) {
+    .app-shell-outer:has([data-landing-root]) {
+      padding: 0;
+    }
+
+    .app-shell:has([data-landing-root]) {
+      border-color: transparent;
+      border-radius: 0;
+    }
   }
 }
