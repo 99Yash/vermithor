@@ -433,6 +433,7 @@ export function LandingClient() {
           </div>
         </footer>
       </main>
+      <DragonLines className="top-auto bottom-[-180px] opacity-70" />
     </div>
   );
 }
