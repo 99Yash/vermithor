@@ -2,9 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
-import type { CSSProperties } from 'react';
 import { DragonLines } from '~/components/ornaments/dragon-lines';
-import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { GitHub, LinkedIn, Mail, X } from '~/components/ui/icons';
 import { authClient } from '~/lib/auth/client';
@@ -18,44 +16,23 @@ const glowOrbs = [
   'pointer-events-none absolute -bottom-40 -right-32 h-72 w-72 rounded-full bg-linear-to-tl from-neutral-500/18 via-stone-400/10 to-transparent blur-3xl dark:from-amber-300/18 dark:via-orange-200/10 dark:to-transparent',
   'pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-96 w-96 rounded-full bg-linear-to-b from-amber-400/18 via-amber-300/8 to-transparent blur-3xl dark:from-amber-300/25 dark:via-amber-200/12 dark:to-transparent',
 ];
-
-const streamLetters = Array.from('stream');
-const streamLetterStyle = (index: number) =>
-  ({
-    '--index': index,
-    '--offset': index - (streamLetters.length - 1) / 2,
-  }) as CSSProperties;
-
-const streamItems = [
-  {
-    title: 'Design Systems Lead',
-    detail: 'Systems thinking, accessibility, UX leadership.',
-    status: 'New',
-  },
-  {
-    title: 'Senior Frontend Engineer',
-    detail: 'Frontend craft and UI architecture.',
-    status: 'In review',
-  },
-  {
-    title: 'Product Engineer, Growth',
-    detail: 'Experimentation and metrics-driven delivery.',
-    status: 'Matched',
-  },
+const bottomGlowOrbs = [
+  'pointer-events-none absolute -bottom-56 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-linear-to-t from-amber-500/20 via-amber-300/10 to-transparent blur-3xl dark:from-amber-300/25 dark:via-amber-200/12',
+  'pointer-events-none absolute -bottom-48 right-[-10%] h-80 w-80 rounded-full bg-linear-to-tl from-stone-400/18 via-zinc-300/10 to-transparent blur-3xl dark:from-amber-200/16 dark:via-amber-100/10',
 ];
 
-const momentumHighlights = [
+const featureHighlights = [
   {
     title: 'Focused profile',
-    description: 'We translate your résumé into a clear profile for matching.',
+    description: 'Turn your résumé into a clear, searchable profile.',
   },
   {
     title: 'Live matching',
-    description: 'Roles stream in as soon as each stage finishes.',
+    description: 'Matches arrive as each stage finishes, not in a nightly batch.',
   },
   {
-    title: 'Control built in',
-    description: 'Filter, search, and refine without losing your place.',
+    title: 'Curated control',
+    description: 'Filter, compare, and save roles without losing context.',
   },
 ];
 
@@ -65,61 +42,62 @@ const workflowSteps = [
     description: 'Start with your résumé.',
   },
   {
-    title: 'Profile',
-    description: 'We map your strengths into a focused view.',
+    title: 'Focus',
+    description: 'We map experience, preferences, and goals.',
   },
   {
     title: 'Match',
-    description: 'Roles align to your goals and experience.',
+    description: 'Roles align to your criteria.',
   },
   {
     title: 'Stream',
-    description: 'Matches arrive as soon as they are ready.',
+    description: 'Matches arrive with context as they are ready.',
   },
 ];
 
-const durabilityHighlights = [
+const detailBlocks = [
   {
-    title: 'Checkpointed stages',
-    description: 'Progress persists so work resumes smoothly.',
+    eyebrow: 'Explore with clarity',
+    title: 'Everything you need to compare roles, in one view.',
+    description: 'Filters, notes, and saved views stay pinned as the stream updates.',
+    items: [
+      'Single view for filters and notes.',
+      'Results refresh as you refine.',
+      'Saved views for quick return.',
+    ],
   },
   {
-    title: 'Smart retries',
-    description: 'Automatic retries handle small hiccups.',
-  },
-  {
-    title: 'Independent queues',
-    description: 'Discovery and analysis stay separate for stability.',
-  },
-];
-
-const streamingHighlights = [
-  {
-    title: 'Progress in view',
-    description: 'Queued → running → delivered stays visible.',
-  },
-  {
-    title: 'Live by default',
-    description: 'Matches stream in as each stage finishes.',
-  },
-  {
-    title: 'Organized output',
-    description: 'Matches arrive organized for filtering and search.',
+    eyebrow: 'Refine the résumé',
+    title: 'Make edits with guidance, not guesswork.',
+    description: 'Inline suggestions and checks keep your story tight.',
+    items: [
+      'Inline suggestions as you edit.',
+      'Quick checks before you rerun matches.',
+      'Snapshots to compare and recover.',
+    ],
   },
 ];
 
-const explorationChips = ['Filters', 'Sorts', 'Search', 'Pages'];
-
-const explorationSteps = [
-  'One view for filters and sorts.',
-  'Results refresh as you tweak.',
-  'Keep exploring without a reset.',
-];
-
-const resumeSteps = [
-  'Inline suggestions as you edit.',
-  'Quick checks before you save.',
-  'Snapshots to undo, compare, and rerun matches.',
+const reliabilitySections = [
+  {
+    title: 'Durability by default',
+    description:
+      'Checkpointed stages keep progress steady even when data is messy.',
+    items: [
+      'Checkpointed stages keep flow intact.',
+      'Automatic retries for small hiccups.',
+      'Independent queues for discovery and analysis.',
+    ],
+  },
+  {
+    title: 'Progress stays visible',
+    description: 'Every match shows where it sits and what comes next.',
+    items: [
+      'Queued → running → delivered at a glance.',
+      'Live results as each stage finishes.',
+      'Organized output for filtering and search.',
+    ],
+  },
 ];
 
 const socialLinks = [
@@ -129,22 +107,60 @@ const socialLinks = [
   { href: `mailto:${siteConfig.links.mail}`, label: 'Email', icon: Mail },
 ];
 
+const trustMarks = [
+  'Talent teams',
+  'Career coaches',
+  'Product orgs',
+  'Founders',
+  'Studios',
+];
+
 const primaryCtaClass =
   'group px-8 py-4 text-base font-semibold tracking-tight shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 dark:shadow-amber-500/30 dark:hover:shadow-amber-400/45';
+const secondaryCtaClass =
+  'px-8 py-4 text-base font-semibold tracking-tight';
 const sectionCardClass =
-  'rounded-3xl border border-border/60 bg-card/70 p-8 shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-500/10';
+  'rounded-3xl border border-border/50 bg-background/70 p-8 shadow-sm dark:border-amber-200/10 dark:bg-slate-950/55';
 const featureCardClass =
-  'rounded-2xl border border-border/60 bg-card/60 p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/25';
-const surfaceCardClass =
-  'rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/25';
+  'rounded-2xl border border-border/50 bg-background/60 p-6 shadow-sm dark:border-amber-200/10 dark:bg-slate-950/55';
 const surfacePanelClass =
-  'rounded-2xl border border-border/60 bg-background/60 px-4 py-3 text-[13.5px] font-medium tracking-tight text-muted-foreground dark:border-amber-200/10 dark:bg-slate-950/50 dark:text-amber-100/70';
+  'rounded-2xl border border-border/50 bg-background/60 px-4 py-3 text-[13px] font-medium tracking-tight text-muted-foreground dark:border-amber-200/10 dark:bg-slate-950/50 dark:text-amber-100/70';
 const smallDescriptionClass =
   'text-[13.5px] font-medium tracking-tight text-muted-foreground';
 const stepBadgeClass =
   'flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary dark:bg-amber-500/15 dark:text-amber-100/90';
 const miniStepBadgeClass =
   'flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary dark:bg-amber-500/15 dark:text-amber-100/90';
+const serifDisplayClass =
+  "font-['Perfectly_Nineties',serif] font-normal tracking-[-0.05em]";
+const serifSectionClass =
+  "font-['Perfectly_Nineties',serif] font-normal tracking-[-0.03em]";
+const eyebrowClass =
+  'text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground';
+const tagClass =
+  'rounded-full border border-border/60 bg-background/70 px-3 py-1 text-[11px] font-medium tracking-[-0.01em] text-muted-foreground dark:border-amber-200/10 dark:bg-slate-950/60 dark:text-amber-100/80';
+const heroTitleClass = `mx-auto max-w-5xl text-[clamp(2.9rem,6.8vw,5.8rem)] leading-[0.95] ${serifDisplayClass}`;
+const heroDescriptionClass =
+  'mx-auto max-w-2xl text-pretty text-[17px] leading-[1.6] text-muted-foreground sm:text-lg';
+const sectionTitleClass = `text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.05] ${serifSectionClass}`;
+const sectionDescriptionClass =
+  'mx-auto max-w-2xl text-pretty text-base text-muted-foreground';
+
+const SectionHeader = ({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) => (
+  <div className="flex flex-col items-center gap-3 text-center">
+    <p className={`${eyebrowClass} w-fit`}>{eyebrow}</p>
+    <h2 className={`text-gradient-subtle ${sectionTitleClass}`}>{title}</h2>
+    <p className={sectionDescriptionClass}>{description}</p>
+  </div>
+);
 
 export function LandingClient() {
   const { data: session } = authClient.useSession();
@@ -155,15 +171,15 @@ export function LandingClient() {
   } = useQuery(trpc.healthCheck.queryOptions());
   const firstName = session?.user?.name?.split(' ')[0];
   const statusText = error
-    ? 'Error: unable to check status'
+    ? 'Pipeline: offline'
     : isLoading
-      ? 'Checking status...'
+      ? 'Checking pipeline...'
       : healthCheck
-        ? `Status: ${healthCheck}`
-        : 'Status: unavailable';
+        ? `Pipeline: ${healthCheck}`
+        : 'Pipeline: unavailable';
   const greeting = firstName
     ? `Welcome back, ${firstName}.`
-    : 'Always on. Always matching.';
+    : 'Curated matches, always in motion.';
 
   return (
     <div className="relative min-h-full bg-background">
@@ -175,96 +191,105 @@ export function LandingClient() {
         <DragonLines className="top-auto bottom-[-180px] opacity-70" />
       </div>
 
-      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-20 px-6 pb-20 pt-16 lg:px-10">
-        <section className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="flex flex-col gap-6">
-            <div className="space-y-4">
-              <h1 className="heading-xl text-balance">
-                Curated jobs in your feed in{' '}
-                <span className="text-gradient-brand">real </span>
-                time.
-              </h1>
-              <p className="text-pretty font-medium text-muted-foreground text-lg">
-                Upload your resume. Build a profile. We'll find roles that fit.
-              </p>
+      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-28 px-6 pb-20 pt-12 lg:px-10">
+        <header className="flex items-center justify-between gap-6">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/70 shadow-sm dark:border-amber-200/20 dark:bg-slate-950/60">
+              <img
+                src="/favicon.svg"
+                alt={`${siteConfig.name} mark`}
+                className="h-6 w-6 opacity-90"
+              />
             </div>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-              <Button asChild size="lg" className={primaryCtaClass}>
-                <Link href="/signin">
-                  Get started
-                  <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </Link>
+            <span className="text-sm font-semibold tracking-tight">
+              {siteConfig.name}
+            </span>
+          </Link>
+          <div className="flex items-center gap-3">
+            {!session?.user ? (
+              <Button asChild variant="outline" className={secondaryCtaClass}>
+                <Link href="/signin">Sign in</Link>
               </Button>
-            </div>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 dark:border-amber-200/10 dark:bg-slate-950/60 dark:text-amber-100/80">
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70 dark:bg-emerald-300/70" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 dark:bg-emerald-300" />
+            ) : null}
+            <Button asChild size="lg" className={primaryCtaClass}>
+              <Link href="/signin">
+                Get started
+                <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
+                  →
                 </span>
-                {statusText}
-              </span>
-              <span>{greeting}</span>
-            </div>
+              </Link>
+            </Button>
           </div>
-          <div className="relative">
-            <div className="absolute -inset-6 rounded-[32px] bg-linear-to-br from-amber-500/15 via-transparent to-yellow-500/12 blur-xl dark:from-amber-400/25 dark:via-transparent dark:to-amber-300/15 dark:blur-2xl" />
-            <div className="relative rounded-3xl border border-border/60 bg-card/80 p-6 shadow-2xl shadow-amber-500/10 backdrop-blur-sm dark:border-amber-200/10 dark:bg-slate-950/60 dark:shadow-amber-400/20">
-              <div className="flex items-center justify-between">
-                <Badge
-                  variant="secondary"
-                  className="bg-secondary/70 dark:border-amber-200/20 dark:bg-amber-500/10 dark:text-amber-100/80"
-                >
-                  Match stream
-                </Badge>
-                <span className="text-xs text-muted-foreground">
-                  Live results
+        </header>
+
+        <section className="mx-auto flex max-w-5xl flex-col items-center gap-8 text-center lg:gap-10">
+          <div className="space-y-6">
+            <p className={`${eyebrowClass} mx-auto w-fit`}>
+              Career matching, refined
+            </p>
+            <h1 className={`text-balance ${heroTitleClass}`}>
+              The matching workspace for focused career moves.
+            </h1>
+            <p className={heroDescriptionClass}>
+              Upload your résumé, set your focus, and let Vermithor stream roles
+              as each stage completes. Everything is transparent, easy to
+              compare, and ready to act on.
+            </p>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button asChild size="lg" className={primaryCtaClass}>
+              <Link href="/signin">
+                Get started
+                <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
+                  →
                 </span>
-              </div>
-              <div className="mt-6 space-y-4">
-                {streamItems.map((item) => (
-                  <div key={item.title} className={surfaceCardClass}>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold">{item.title}</p>
-                      <Badge
-                        variant="outline"
-                        className="border-border/60 text-[10px] uppercase tracking-wide dark:border-amber-200/20 dark:text-amber-100/80"
-                      >
-                        {item.status}
-                      </Badge>
-                    </div>
-                    <p className={`mt-2 ${smallDescriptionClass}`}>
-                      {item.detail}
-                    </p>
-                    <div className="mt-3 h-1 w-full rounded-full bg-muted dark:bg-amber-950/50">
-                      <div className="shimmer h-full w-2/3 rounded-full bg-linear-to-r from-amber-600/55 via-orange-500/45 to-amber-400/55 dark:from-amber-300/70 dark:via-amber-200/50 dark:to-orange-200/60" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className={`${surfacePanelClass} flex items-center gap-2`}>
-                <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-emerald-400/80 dark:bg-emerald-300/80" />
-                <span>Updates land as each step finishes.</span>
-              </div>
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className={secondaryCtaClass}>
+              <a href={`mailto:${siteConfig.links.mail}`}>Request demo</a>
+            </Button>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 dark:border-amber-200/10 dark:bg-slate-950/60 dark:text-amber-100/80">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70 dark:bg-emerald-300/70" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 dark:bg-emerald-300" />
+              </span>
+              {statusText}
+            </span>
+            <span>{greeting}</span>
+          </div>
+          <div className="space-y-3 text-xs text-muted-foreground">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+              Trusted by focused teams and solo builders
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {trustMarks.map((mark) => (
+                <span key={mark} className={tagClass}>
+                  {mark}
+                </span>
+              ))}
             </div>
           </div>
         </section>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10">
+          {bottomGlowOrbs.map((className, index) => (
+            <div key={`glow-bottom-${index}`} className={className} />
+          ))}
+        </div>
 
-        <section className="grid gap-8">
-          <div className="flex flex-col gap-3">
-            <h2 className="heading-lg text-gradient-subtle">
-              Designed for momentum
-            </h2>
-            <p className="text-pretty text-base text-muted-foreground">
-              Everything stays crisp, fast, and moving forward.
-            </p>
-          </div>
+        <section id="momentum" className="grid gap-10 scroll-mt-24">
+          <SectionHeader
+            eyebrow="Designed for focus"
+            title="Move with clarity, not noise."
+            description="Every step stays crisp, calm, and deliberate."
+          />
           <div className="grid gap-6 md:grid-cols-3">
-            {momentumHighlights.map((item) => (
+            {featureHighlights.map((item) => (
               <div key={item.title} className={featureCardClass}>
-                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <h3 className={`text-xl ${serifSectionClass}`}>
+                  {item.title}
+                </h3>
                 <p className="mt-3 text-sm text-muted-foreground">
                   {item.description}
                 </p>
@@ -273,22 +298,23 @@ export function LandingClient() {
           </div>
         </section>
 
-        <section id="workflow" className="grid gap-8 scroll-mt-24">
-          <div className="flex flex-col gap-3">
-            <h2 className="heading-lg text-gradient-subtle">The flow</h2>
-            <p className="text-pretty text-base text-muted-foreground">
-              Four steps. Always moving.
-            </p>
-          </div>
+        <section id="workflow" className="grid gap-10 scroll-mt-24">
+          <SectionHeader
+            eyebrow="The flow"
+            title="Four steps, always in motion."
+            description="From résumé to matches in a steady stream."
+          />
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {workflowSteps.map((step, index) => (
               <div
                 key={step.title}
-                className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card/60 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg dark:border-amber-200/10 dark:bg-slate-950/60 dark:hover:shadow-amber-500/25"
+                className="group relative overflow-hidden rounded-2xl border border-border/50 bg-background/60 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/60 dark:hover:shadow-amber-500/20"
               >
                 <div className="flex items-center gap-3">
                   <span className={stepBadgeClass}>{`0${index + 1}`}</span>
-                  <h3 className="text-lg font-semibold">{step.title}</h3>
+                  <h3 className={`text-lg ${serifSectionClass}`}>
+                    {step.title}
+                  </h3>
                 </div>
                 <p className="mt-3 text-sm text-muted-foreground">
                   {step.description}
@@ -299,110 +325,71 @@ export function LandingClient() {
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div className={sectionCardClass}>
-            <h3 className="text-2xl font-semibold">Explore with clarity</h3>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Filter, sort, search, and page without losing your place. Your
-              choices stay put.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {explorationChips.map((chip) => (
-                <Badge
-                  key={chip}
-                  variant="outline"
-                  className="bg-background/70 dark:border-amber-200/20 dark:bg-slate-950/50 dark:text-amber-100/80"
-                >
-                  {chip}
-                </Badge>
-              ))}
+        <section className="grid gap-8 lg:grid-cols-2">
+          {detailBlocks.map((block) => (
+            <div key={block.title} className={sectionCardClass}>
+              <p className={eyebrowClass}>{block.eyebrow}</p>
+              <h3
+                className={`mt-3 text-2xl text-balance ${serifSectionClass}`}
+              >
+                {block.title}
+              </h3>
+              <p className="mt-3 text-sm text-muted-foreground">
+                {block.description}
+              </p>
+              <div className="mt-6 grid gap-3">
+                {block.items.map((item, index) => (
+                  <div
+                    key={item}
+                    className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3 dark:border-amber-200/10 dark:bg-slate-950/50"
+                  >
+                    <span className={miniStepBadgeClass}>{index + 1}</span>
+                    <p className={smallDescriptionClass}>{item}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mt-6 grid gap-3 text-xs text-muted-foreground">
-              {explorationSteps.map((step) => (
-                <div key={step} className={surfacePanelClass}>
-                  {step}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className={sectionCardClass}>
-            <h3 className="text-2xl font-semibold">Résumé, refined</h3>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Suggestions land in the editor. Refine quickly, save with
-              confidence, and rerun matches.
-            </p>
-            <div className="mt-6 grid gap-3">
-              {resumeSteps.map((step, index) => (
-                <div
-                  key={step}
-                  className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3 dark:border-amber-200/10 dark:bg-slate-950/50"
-                >
-                  <span className={miniStepBadgeClass}>{index + 1}</span>
-                  <p className={smallDescriptionClass}>{step}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </section>
 
-        <section className="grid gap-8">
-          <div className="flex flex-col gap-3">
-            <h2 className="heading-lg text-gradient-subtle">
-              Engineered for flow
-            </h2>
-            <p className="text-pretty text-base text-muted-foreground">
-              Quiet systems keep everything reliable and fast.
-            </p>
-          </div>
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className={sectionCardClass}>
-              <h3 className="text-2xl font-semibold">Reliability, built in</h3>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Checkpointed stages and durable queues keep the pipeline moving.
-              </p>
-              <div className="mt-6 grid gap-4">
-                {durabilityHighlights.map((item) => (
-                  <div
-                    key={item.title}
-                    className="rounded-2xl border border-border/60 bg-background/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/55 dark:shadow-amber-500/10 dark:hover:shadow-amber-500/20"
-                  >
-                    <h4 className="text-sm font-semibold">{item.title}</h4>
-                    <p className={`mt-2 ${smallDescriptionClass}`}>
-                      {item.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className={sectionCardClass}>
-              <h3 className="text-2xl font-semibold">Live visibility</h3>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Results arrive as they are ready, with progress always visible.
-              </p>
-              <div className="mt-6 space-y-4">
-                {streamingHighlights.map((item) => (
-                  <div
-                    key={item.title}
-                    className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4 dark:border-amber-200/10 dark:bg-slate-950/55"
-                  >
-                    <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
-                    <div>
-                      <p className="text-sm font-semibold">{item.title}</p>
-                      <p className={`mt-1 ${smallDescriptionClass}`}>
-                        {item.description}
-                      </p>
+        <section id="reliability" className="grid gap-10 scroll-mt-24">
+          <SectionHeader
+            eyebrow="Reliability"
+            title="Engineered for steady progress."
+            description="Quiet systems keep the stream moving even when the data is messy."
+          />
+          <div className="grid gap-6 lg:grid-cols-2">
+            {reliabilitySections.map((section) => (
+              <div key={section.title} className={sectionCardClass}>
+                <h3 className={`text-2xl ${serifSectionClass}`}>
+                  {section.title}
+                </h3>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {section.description}
+                </p>
+                <div className="mt-6 grid gap-4">
+                  {section.items.map((item) => (
+                    <div
+                      key={item}
+                      className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4 dark:border-amber-200/10 dark:bg-slate-950/55"
+                    >
+                      <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
+                      <p className={smallDescriptionClass}>{item}</p>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </section>
 
         <section className="rounded-3xl border border-border/60 bg-linear-to-br from-amber-500/12 via-transparent to-yellow-500/10 px-6 py-12 text-center shadow-lg dark:border-amber-200/10 dark:from-amber-400/20 dark:via-transparent dark:to-amber-200/12 dark:shadow-amber-500/15 sm:px-10">
-          <h2 className="heading-md text-balance">Ready when you are.</h2>
+          <h2 className={`heading-md text-balance ${serifSectionClass}`}>
+            Ready to see the stream?
+          </h2>
           <p className="mt-4 text-pretty text-base text-muted-foreground">
-            Upload your résumé and watch the matches arrive in real time.
+            Start with a focused profile, then let the matching run in the
+            background.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button asChild size="lg" className={primaryCtaClass}>
@@ -431,12 +418,12 @@ export function LandingClient() {
                   {siteConfig.name}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Résumé to matches.
+                  Profiles to matches.
                 </p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              Focused profiles in, live matches out—built for momentum.
+              Calm matching, deliberate moves.
             </p>
           </div>
           <div className="flex flex-col items-center gap-4 sm:items-end">
