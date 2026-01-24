@@ -1,5 +1,6 @@
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { DragonLines } from '~/components/ornaments/dragon-lines';
 import { siteConfig } from '~/lib/site';
 
 export default function AuthLayout(props: { children: React.ReactNode }) {
@@ -7,6 +8,7 @@ export default function AuthLayout(props: { children: React.ReactNode }) {
     <>
       <div className="relative h-full overflow-hidden bg-background">
         <div className="pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-linear-to-br from-amber-500/10 via-amber-300/5 to-transparent blur-3xl dark:from-amber-400/15 dark:via-amber-300/10" />
+        <DragonLines className="opacity-60" />
         <Link
           href="/"
           className="absolute left-6 top-6 z-10 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"

@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { GitHub, LinkedIn, Mail, X } from '~/components/ui/icons';
+import { DragonLines } from '~/components/ornaments/dragon-lines';
 import { authClient } from '~/lib/auth/client';
 import { siteConfig } from '~/lib/site';
 import { trpc } from '~/lib/trpc';
@@ -24,25 +25,6 @@ const streamLetterStyle = (index: number) =>
     '--index': index,
     '--offset': index - (streamLetters.length - 1) / 2,
   }) as CSSProperties;
-
-const dragonSketchLines = [
-  { d: 'M940 120 C900 90 850 95 810 135', opacity: 0.5 },
-  { d: 'M820 160 C860 175 900 190 940 210', opacity: 0.35 },
-  {
-    d: 'M810 135 C760 190 700 245 640 300 C600 340 560 370 520 400',
-    opacity: 0.45,
-  },
-  {
-    d: 'M520 400 C600 360 700 350 800 390 C900 430 980 470 1080 500',
-    opacity: 0.35,
-  },
-  {
-    d: 'M520 400 C470 440 420 480 360 520 C300 560 230 600 170 640',
-    opacity: 0.4,
-    dash: '8 14',
-  },
-  { d: 'M700 310 C750 340 790 380 820 430', opacity: 0.3 },
-];
 
 const streamItems = [
   {
@@ -164,15 +146,19 @@ const miniStepBadgeClass =
 
 export function LandingClient() {
   const { data: session } = authClient.useSession();
-  const { data: healthCheck, isLoading } = useQuery(
-    trpc.healthCheck.queryOptions(),
-  );
+  const {
+    data: healthCheck,
+    isLoading,
+    error,
+  } = useQuery(trpc.healthCheck.queryOptions());
   const firstName = session?.user?.name?.split(' ')[0];
-  const statusText = isLoading
-    ? 'Checking status...'
-    : healthCheck
-      ? `Status: ${healthCheck}`
-      : 'Status: unavailable';
+  const statusText = error
+    ? 'Error: unable to check status'
+    : isLoading
+      ? 'Checking status...'
+      : healthCheck
+        ? `Status: ${healthCheck}`
+        : 'Status: unavailable';
   const greeting = firstName
     ? `Welcome back, ${firstName}.`
     : 'Always on. Always matching.';
@@ -182,41 +168,19 @@ export function LandingClient() {
       {glowOrbs.map((className, index) => (
         <div key={`glow-${index}`} className={className} aria-hidden="true" />
       ))}
-      <svg
-        className="dragon-drift pointer-events-none absolute right-[-200px] top-[-140px] h-[600px] w-[900px] opacity-70"
-        viewBox="0 0 1200 800"
-        fill="none"
-        aria-hidden="true"
-      >
-        <g
-          className="text-amber-700/30 dark:text-amber-200/25"
-          stroke="currentColor"
-          strokeWidth="1.3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          {dragonSketchLines.map((line, index) => (
-            <path
-              key={`dragon-line-${index}`}
-              d={line.d}
-              opacity={line.opacity}
-              strokeDasharray={line.dash}
-            />
-          ))}
-        </g>
-      </svg>
+      <DragonLines className="opacity-80" />
 
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-20 px-6 pb-20 pt-16 lg:px-10">
         <section className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="flex flex-col gap-6">
             <div className="space-y-4">
               <h1 className="heading-xl text-balance">
-                Job matches. <span className="text-gradient-brand">In</span>{' '}
-                real time.
+                Curated jobs in your feed in{' '}
+                <span className="text-gradient-brand">real </span>
+                time.
               </h1>
               <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-                Upload your résumé once. We build a focused profile and stream
-                roles that fit.
+                Upload your resume. Build a profile. We'll find roles that fit.
               </p>
             </div>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -431,9 +395,7 @@ export function LandingClient() {
         </section>
 
         <section className="rounded-3xl border border-border/60 bg-linear-to-br from-amber-500/12 via-transparent to-yellow-500/10 px-6 py-12 text-center shadow-lg dark:border-amber-200/10 dark:from-amber-400/20 dark:via-transparent dark:to-amber-200/12 dark:shadow-amber-500/15 sm:px-10">
-          <h2 className="heading-md text-balance">
-            Ready when you are.
-          </h2>
+          <h2 className="heading-md text-balance">Ready when you are.</h2>
           <p className="mt-4 text-pretty text-base text-muted-foreground">
             Upload your résumé and watch the matches arrive in real time.
           </p>
