@@ -1,4 +1,3 @@
-import { CommandIcon } from 'lucide-react';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { OAuthButtons } from '~/app/(auth)/signin/oauth-buttons';
@@ -18,8 +17,12 @@ export default async function AuthenticationPage() {
   return (
     <div className="w-full rounded-2xl bg-background/80 p-8 backdrop-blur">
       <div className="flex flex-col items-center gap-3 text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/70 bg-background shadow-sm">
-          <CommandIcon className="h-5 w-5" />
+        <div className="flex h-12 w-12 items-center justify-center">
+          <img
+            src="/favicon.svg"
+            alt={`${siteConfig.name} mark`}
+            className="h-12 w-12 opacity-90"
+          />
         </div>
         <div className="space-y-1">
           <h1 className="text-[32px] font-normal leading-[36px] tracking-[-0.96px] font-['Perfectly_Nineties',serif]">

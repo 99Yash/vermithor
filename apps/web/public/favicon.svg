@@ -1,0 +1,68 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  fill="none"
+  shape-rendering="geometricPrecision"
+>
+  <defs>
+    <linearGradient id="outerGradient" x1="12" y1="10" x2="52" y2="56">
+      <stop offset="0" stop-color="#C87B38" />
+      <stop offset="0.55" stop-color="#B06A2D" />
+      <stop offset="1" stop-color="#965824" />
+    </linearGradient>
+    <linearGradient id="innerGradient" x1="24" y1="12" x2="40" y2="38">
+      <stop offset="0" stop-color="#E8A05A" />
+      <stop offset="1" stop-color="#C97C3C" />
+    </linearGradient>
+    <mask id="outerIncisions" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+      <rect width="64" height="64" fill="#fff" />
+      <rect
+        x="13.5"
+        y="18.7"
+        width="8"
+        height="1.6"
+        fill="#000"
+        transform="rotate(-28 17.5 19.5)"
+      />
+      <rect
+        x="16.5"
+        y="27.7"
+        width="8"
+        height="1.6"
+        fill="#000"
+        transform="rotate(-28 20.5 28.5)"
+      />
+      <rect
+        x="42.5"
+        y="18.7"
+        width="8"
+        height="1.6"
+        fill="#000"
+        transform="rotate(28 46.5 19.5)"
+      />
+      <rect
+        x="39.5"
+        y="27.7"
+        width="8"
+        height="1.6"
+        fill="#000"
+        transform="rotate(28 43.5 28.5)"
+      />
+    </mask>
+  </defs>
+
+  <g mask="url(#outerIncisions)">
+    <path fill="url(#outerGradient)" d="M8 10L32 56L56 10H48L32 44L16 10H8Z" />
+    <path
+      fill="#8A4F1F"
+      opacity="0.22"
+      d="M8 10L32 56L36.5 48.5L16 10H8Z"
+    />
+  </g>
+  <path fill="url(#innerGradient)" d="M22 12L32 38L42 12H37L32 26L27 12H22Z" />
+  <path
+    fill="#F4B46C"
+    opacity="0.7"
+    d="M24.5 13L32 31L39.5 13H37L32 23L27 13H24.5Z"
+  />
+</svg>
