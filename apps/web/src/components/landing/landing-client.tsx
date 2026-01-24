@@ -3,10 +3,10 @@
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
+import { DragonLines } from '~/components/ornaments/dragon-lines';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { GitHub, LinkedIn, Mail, X } from '~/components/ui/icons';
-import { DragonLines } from '~/components/ornaments/dragon-lines';
 import { authClient } from '~/lib/auth/client';
 import { siteConfig } from '~/lib/site';
 import { trpc } from '~/lib/trpc';
@@ -179,7 +179,7 @@ export function LandingClient() {
                 <span className="text-gradient-brand">real </span>
                 time.
               </h1>
-              <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
+              <p className="text-pretty font-medium text-muted-foreground text-lg">
                 Upload your resume. Build a profile. We'll find roles that fit.
               </p>
             </div>
@@ -239,9 +239,9 @@ export function LandingClient() {
                   </div>
                 ))}
               </div>
-              <div className={surfacePanelClass}>
-                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400/80 dark:bg-emerald-300/80" />
-                Updates land as each step finishes.
+              <div className={`${surfacePanelClass} flex items-center gap-2`}>
+                <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-emerald-400/80 dark:bg-emerald-300/80" />
+                <span>Updates land as each step finishes.</span>
               </div>
             </div>
           </div>
