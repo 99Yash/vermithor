@@ -1,3 +1,4 @@
+import type { Route } from 'next';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { OAuthButtons } from '~/app/(auth)/signin/oauth-buttons';
@@ -11,7 +12,7 @@ export default async function AuthenticationPage() {
   });
 
   if (session?.user) {
-    redirect('/');
+    redirect('/dashboard' as Route);
   }
 
   return (

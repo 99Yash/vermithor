@@ -1,11 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
-import { authClient } from '~/lib/auth/client';
 import { trpc } from '~/lib/trpc';
 
 type UploadStatus = 'idle' | 'uploading' | 'confirming' | 'success' | 'error';
@@ -31,7 +29,6 @@ function formatBytes(bytes: number) {
 }
 
 export default function ResumeUploadPage() {
-  const { data: session } = authClient.useSession();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<UploadStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -39,18 +36,6 @@ export default function ResumeUploadPage() {
   const confirmUpload = useMutation(trpc.resumes.confirmUpload.mutationOptions());
 
   const isBusy = status === 'uploading' || status === 'confirming';
-
-  if (!session) {
-    return (
-      <div className="mx-auto flex w-full max-w-xl flex-col gap-3 px-6 py-10">
-        <h1 className="text-2xl font-semibold">Upload resume</h1>
-        <p className="text-sm text-muted-foreground">
-          Please <Link href="/signin" className="underline">sign in</Link> to upload
-          a resume.
-        </p>
-      </div>
-    );
-  }
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextFile = event.target.files?.[0] ?? null;

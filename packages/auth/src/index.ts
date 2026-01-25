@@ -33,6 +33,7 @@ export const auth = betterAuth<BetterAuthOptions>({
       sameSite: isProduction ? 'none' : 'lax',
       secure: isProduction,
       httpOnly: true,
+      path: '/',
     },
     cookiePrefix: 'vermithor__',
   },

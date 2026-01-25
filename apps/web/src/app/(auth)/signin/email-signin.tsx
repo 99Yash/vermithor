@@ -43,7 +43,7 @@ export function EmailSignIn() {
         await authClient.signIn.email({
           email,
           password,
-          callbackURL: '/',
+          callbackURL: '/dashboard',
         });
 
         // Persist last used auth method
@@ -51,7 +51,7 @@ export function EmailSignIn() {
           setLocalStorageItem('LAST_AUTH_METHOD', 'EMAIL');
         }
 
-        router.push('/');
+        router.push('/dashboard');
         toast.success('Successfully signed in!');
       } catch (error) {
         toast.error(getErrorMessage(error));
