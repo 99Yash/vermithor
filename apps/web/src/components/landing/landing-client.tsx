@@ -135,7 +135,7 @@ const eyebrowClass =
   'text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground';
 const heroTitleClass = `mx-auto max-w-5xl text-[clamp(2.9rem,6.8vw,5.8rem)] leading-[0.95] ${serifDisplayClass}`;
 const heroDescriptionClass =
-  'mx-auto max-w-2xl text-pretty text-[17px] leading-[1.6] text-muted-foreground sm:text-lg';
+  'mx-auto max-w-2xl text-pretty tracking-tight text-[14px] leading-[1.6] text-muted-foreground sm:text-lg';
 const heroOrbClass =
   'pointer-events-none absolute left-1/2 top-0 -z-10 h-[420px] w-[520px] -translate-x-1/2 -translate-y-[30%] rounded-full bg-linear-to-b from-amber-300/14 via-stone-200/6 to-transparent blur-3xl opacity-70 dark:from-amber-200/10 dark:via-slate-200/6 dark:opacity-40';
 const sectionTitleClass = `text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.05] ${serifSectionClass}`;
@@ -241,7 +241,9 @@ export function LandingClient() {
               </span>
               {statusText}
             </span>
-            <span>{greeting}</span>
+            <span className="text-xs tracking-tight font-medium text-muted-foreground">
+              {greeting}
+            </span>
           </div>
         </section>
 
