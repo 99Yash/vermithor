@@ -1,17 +1,16 @@
 import type { Route } from 'next';
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { OAuthButtons } from '~/app/(auth)/signin/oauth-buttons';
-import { authServer } from '~/lib/auth/server';
+import { getServerSessionSnapshot } from '~/lib/auth/session';
 import { siteConfig } from '~/lib/site';
 import { EmailSignIn } from './email-signin';
 
-export default async function AuthenticationPage() {
-  const session = await authServer.api.getSession({
-    headers: await headers(),
-  });
+export const dynamic = 'force-dynamic';
 
-  if (session?.user) {
+export default async function AuthenticationPage() {
+  const { session, hasSessionCookie } = await getServerSessionSnapshot();
+
+  if (session?.user || hasSessionCookie) {
     redirect('/dashboard' as Route);
   }
 
