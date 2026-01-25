@@ -7,46 +7,45 @@ import * as z from 'zod/v4';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Spinner } from '~/components/ui/spinner';
+import { useLastAuthMethod } from '~/hooks/use-last-auth-method';
 import { authClient } from '~/lib/auth/client';
-import type { AuthOptionsType } from '~/lib/constants';
-import {
-  getErrorMessage,
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '~/lib/utils';
+import { getErrorMessage, setLocalStorageItem } from '~/lib/utils';
 
-const schema = z.object({
+const signInSchema = z.object({
   email: z.email().max(255, 'Email must be less than 255 characters'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
 });
 
-type EmailSignInProps = z.infer<typeof schema>;
+const signUpSchema = signInSchema.extend({
+  name: z.string().min(1, 'Name is required'),
+});
+
+type SignInPayload = z.infer<typeof signInSchema>;
+type SignUpPayload = z.infer<typeof signUpSchema>;
+type AuthMode = 'signin' | 'signup';
 
 export function EmailSignIn() {
   const router = useRouter();
-  const [lastAuthMethod, setLastAuthMethod] =
-    React.useState<AuthOptionsType | null>(null);
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const lastAuthMethod = getLocalStorageItem('LAST_AUTH_METHOD');
-      setLastAuthMethod(lastAuthMethod ?? null);
-    }
-  }, []);
+  const lastAuthMethod = useLastAuthMethod();
+  const [mode, setMode] = React.useState<AuthMode>('signin');
 
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleSignIn = React.useCallback(
-    async ({ email, password }: EmailSignInProps) => {
+    async ({ email, password }: SignInPayload) => {
       setIsLoading(true);
       try {
-        await authClient.signIn.email({
+        const result = await authClient.signIn.email({
           email,
           password,
           callbackURL: '/dashboard',
         });
 
-        // Persist last used auth method
+        if (result?.error) {
+          toast.error(result.error.message ?? 'Invalid email or password.');
+          return;
+        }
+
         if (typeof window !== 'undefined') {
           setLocalStorageItem('LAST_AUTH_METHOD', 'EMAIL');
         }
@@ -62,11 +61,43 @@ export function EmailSignIn() {
     [router],
   );
 
+  const handleSignUp = React.useCallback(
+    async ({ email, password, name }: SignUpPayload) => {
+      setIsLoading(true);
+      try {
+        const result = await authClient.signUp.email({
+          email,
+          password,
+          name,
+          callbackURL: '/dashboard',
+        });
+
+        if (result?.error) {
+          toast.error(result.error.message ?? 'Sign up failed.');
+          return;
+        }
+
+        if (typeof window !== 'undefined') {
+          setLocalStorageItem('LAST_AUTH_METHOD', 'EMAIL');
+        }
+
+        router.push('/dashboard');
+        toast.success('Account created!');
+      } catch (error) {
+        toast.error(getErrorMessage(error));
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [router],
+  );
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget);
 
+    const schema = mode === 'signup' ? signUpSchema : signInSchema;
     const { success, data, error } = schema.safeParse(
       Object.fromEntries(formData),
     );
@@ -76,11 +107,28 @@ export function EmailSignIn() {
       return;
     }
 
+    if (mode === 'signup') {
+      await handleSignUp(data);
+      return;
+    }
+
     await handleSignIn(data);
   }
 
   return (
     <form className="grid gap-2" onSubmit={handleSubmit}>
+      {mode === 'signup' ? (
+        <div className="grid gap-1">
+          <Input
+            name="name"
+            placeholder="Your name"
+            type="text"
+            autoComplete="name"
+            className="bg-background"
+            required
+          />
+        </div>
+      ) : null}
       <div className="grid gap-1">
         <Input
           name="email"
@@ -107,13 +155,25 @@ export function EmailSignIn() {
         {isLoading ? (
           <Spinner className="mr-2 bg-background" />
         ) : (
-          'Sign In with Email'
+          mode === 'signup' ? 'Create account' : 'Sign In with Email'
         )}
-        {lastAuthMethod === 'EMAIL' && (
+        {mode === 'signin' && lastAuthMethod === 'EMAIL' && (
           <i className="text-xs absolute right-4 text-muted text-center">
             Last used
           </i>
         )}
+      </Button>
+      <Button
+        type="button"
+        variant="link"
+        size="sm"
+        className="justify-start px-0 text-muted-foreground"
+        onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
+        disabled={isLoading}
+      >
+        {mode === 'signup'
+          ? 'Already have an account? Sign in'
+          : "New here? Create an account"}
       </Button>
     </form>
   );

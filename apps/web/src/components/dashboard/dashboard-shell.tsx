@@ -1,13 +1,24 @@
 'use client';
 
+import type { LucideIcon } from 'lucide-react';
+import {
+  Bell,
+  FolderPlus,
+  Gauge,
+  Home,
+  Library,
+  LogOut,
+  Sparkles,
+} from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Bell, FolderPlus, Gauge, Home, Library, LogOut, Sparkles } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { useState, type ComponentProps, type ReactNode } from 'react';
 import { toast } from 'sonner';
-import { DashboardPanel, DashboardPanelContent } from '~/components/dashboard/dashboard-panel';
+import {
+  DashboardPanel,
+  DashboardPanelContent,
+} from '~/components/dashboard/dashboard-panel';
 import { DashboardSidebarToggle } from '~/components/dashboard/sidebar-toggle';
 import { Button } from '~/components/ui/button';
 import {
@@ -40,7 +51,10 @@ type DashboardShellProps = {
   children: ReactNode;
 };
 
-export function DashboardShell({ activeNav = 'home', children }: DashboardShellProps) {
+export function DashboardShell({
+  activeNav = 'home',
+  children,
+}: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -49,8 +63,8 @@ export function DashboardShell({ activeNav = 'home', children }: DashboardShellP
       <div className="mx-auto flex w-full max-w-7xl gap-8 px-4 py-6 lg:px-6">
         <aside
           className={cn(
-            'sticky top-6 hidden h-[calc(100vh-3rem)] shrink-0 flex-col gap-6 self-start pb-4 transition-[width] duration-200 lg:flex',
-            collapsed ? 'w-16 items-center' : 'w-60'
+            'sticky top-6 hidden h-[calc(100svh-3rem)] shrink-0 flex-col gap-6 self-start pb-4 transition-[width] duration-200 lg:flex lg:h-[calc(100svh-4rem-2px)]',
+            collapsed ? 'w-16 items-center' : 'w-60',
           )}
         >
           <SidebarBrand collapsed={collapsed}>
@@ -71,7 +85,9 @@ export function DashboardShell({ activeNav = 'home', children }: DashboardShellP
               label="Open sidebar"
             />
             <div>
-              <p className="text-sm font-semibold leading-tight">{siteConfig.name}</p>
+              <p className="text-sm font-semibold leading-tight">
+                {siteConfig.name}
+              </p>
               <p className="text-xs text-muted-foreground">Dashboard</p>
             </div>
           </div>
@@ -80,10 +96,7 @@ export function DashboardShell({ activeNav = 'home', children }: DashboardShellP
       </div>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent
-          side="left"
-          className="w-72 bg-background p-4"
-        >
+        <SheetContent side="left" className="w-72 bg-background p-4">
           <SheetHeader className="space-y-1">
             <SheetTitle className="text-sm font-semibold">
               {siteConfig.name}
@@ -110,7 +123,9 @@ function SidebarBrand({
 }) {
   return (
     <div className="flex w-full items-center justify-between gap-3">
-      <div className={cn('flex items-center gap-3', collapsed && 'justify-center')}>
+      <div
+        className={cn('flex items-center gap-3', collapsed && 'justify-center')}
+      >
         <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card shadow-sm">
           <img
             src="/favicon.svg"
@@ -119,7 +134,9 @@ function SidebarBrand({
           />
         </div>
         <div className={cn(collapsed && 'sr-only')}>
-          <p className="text-sm font-semibold leading-tight">{siteConfig.name}</p>
+          <p className="text-sm font-semibold leading-tight">
+            {siteConfig.name}
+          </p>
           <p className="text-xs text-muted-foreground">Dashboard</p>
         </div>
       </div>
@@ -199,7 +216,8 @@ function SidebarSections({
                 What's new
               </div>
               <p className="text-xs text-muted-foreground">
-                Resume parsing is in preview. Upload a PDF to see structured results.
+                Resume parsing is in preview. Upload a PDF to see structured
+                results.
               </p>
             </DashboardPanelContent>
           </DashboardPanel>
@@ -252,7 +270,7 @@ function SidebarActionButton({
       className={cn(
         'w-full justify-start gap-2 text-muted-foreground hover:text-foreground',
         collapsed && 'w-10 justify-center px-0',
-        className
+        className,
       )}
       title={collapsed ? label : undefined}
       aria-label={collapsed ? label : undefined}
@@ -279,7 +297,8 @@ function NavItemLink({
     isActive
       ? 'bg-muted text-foreground'
       : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground',
-    item.disabled && 'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-muted-foreground'
+    item.disabled &&
+      'cursor-not-allowed opacity-50 hover:bg-transparent hover:text-muted-foreground',
   );
 
   const content = (
@@ -291,14 +310,22 @@ function NavItemLink({
 
   if (!item.href || item.disabled) {
     return (
-      <div className={baseClassName} aria-disabled="true" title={collapsed ? item.label : undefined}>
+      <div
+        className={baseClassName}
+        aria-disabled="true"
+        title={collapsed ? item.label : undefined}
+      >
         {content}
       </div>
     );
   }
 
   return (
-    <Link className={baseClassName} href={item.href} title={collapsed ? item.label : undefined}>
+    <Link
+      className={baseClassName}
+      href={item.href}
+      title={collapsed ? item.label : undefined}
+    >
       {content}
     </Link>
   );

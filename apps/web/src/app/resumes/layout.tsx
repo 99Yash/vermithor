@@ -1,15 +1,16 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
-import { getServerSessionSnapshot } from '~/lib/auth/session';
+import { DashboardLayout } from '~/components/layouts/dashboard';
+import { getServerSession } from '~/lib/auth/session';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Layout({ children }: { children: ReactNode }) {
-  const { session, hasSessionCookie } = await getServerSessionSnapshot();
+  const session = await getServerSession();
 
-  if (!session?.user && !hasSessionCookie) {
+  if (!session?.user) {
     redirect('/signin');
   }
 
-  return <>{children}</>;
+  return <DashboardLayout>{children}</DashboardLayout>;
 }

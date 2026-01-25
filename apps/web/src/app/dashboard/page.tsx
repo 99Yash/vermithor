@@ -10,6 +10,7 @@ import {
   Upload,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import {
   DashboardPanel,
   DashboardPanelContent,
@@ -132,6 +133,7 @@ const dashboardTabs = [
 
 export default function DashboardPage({ searchParams }: DashboardPageProps) {
   const activeTab = searchParams?.tab === 'resume' ? 'resume' : 'home';
+  const pageTitle = activeTab === 'resume' ? 'Resume' : 'Home';
 
   return (
     <div className="relative isolate space-y-8 pb-10">
@@ -142,7 +144,7 @@ export default function DashboardPage({ searchParams }: DashboardPageProps) {
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
               Dashboard
             </p>
-            <h1 className="text-2xl font-semibold text-foreground">Home</h1>
+            <h1 className="text-2xl font-semibold text-foreground">{pageTitle}</h1>
           </div>
           <Button variant="outline" size="sm">
             Upgrade
@@ -171,18 +173,28 @@ export default function DashboardPage({ searchParams }: DashboardPageProps) {
   );
 }
 
+type SectionHeaderProps = {
+  id: string;
+  title: string;
+  action?: ReactNode;
+};
+
+function SectionHeader({ id, title, action }: SectionHeaderProps) {
+  return (
+    <div className="flex items-center justify-between">
+      <h2 id={id} className="text-sm font-medium text-muted-foreground">
+        {title}
+      </h2>
+      {action}
+    </div>
+  );
+}
+
 function DashboardHome() {
   return (
     <>
       <section aria-labelledby="quick-actions-title" className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2
-            id="quick-actions-title"
-            className="text-sm font-medium text-muted-foreground"
-          >
-            Quick actions
-          </h2>
-        </div>
+        <SectionHeader id="quick-actions-title" title="Quick actions" />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {quickActions.map((action) => (
             <ActionCard key={action.title} action={action} />
@@ -191,11 +203,7 @@ function DashboardHome() {
       </section>
 
       <section aria-labelledby="agent-title" id="agent" className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 id="agent-title" className="text-sm font-medium text-muted-foreground">
-            Agent
-          </h2>
-        </div>
+        <SectionHeader id="agent-title" title="Agent" />
         <DashboardPanel>
           <DashboardPanelContent className="space-y-3">
             <div>
@@ -217,12 +225,18 @@ function DashboardHome() {
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border/60 bg-background px-3 py-2">
+            <div className="group flex flex-wrap items-center gap-2 rounded-xl border border-border/60 bg-transparent px-4 py-1 shadow-xs transition hover:border-border/80 focus-within:border-ring/60 focus-within:shadow-sm focus-within:ring-1 focus-within:ring-ring/20">
               <Input
                 placeholder="Ask the agent to summarize strengths, or rewrite bullets."
-                className="h-8 flex-1 border-0 bg-transparent px-0 text-sm shadow-none focus-visible:ring-0"
+                aria-label="Ask the agent"
+                className="h-8 flex-1 border-0 px-0 text-sm text-foreground placeholder:text-muted-foreground/80 shadow-none focus-visible:ring-0 bg-transparent! dark:bg-transparent!"
               />
-              <Button size="icon" variant="ghost" className="h-8 w-8">
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                className="rounded-lg text-muted-foreground transition hover:bg-muted/40 hover:text-foreground"
+                aria-label="Send to agent"
+              >
                 <Sparkles className="size-4" />
               </Button>
             </div>
@@ -235,17 +249,15 @@ function DashboardHome() {
         id="get-started"
         className="space-y-3"
       >
-        <div className="flex items-center justify-between">
-          <h2
-            id="get-started-title"
-            className="text-sm font-medium text-muted-foreground"
-          >
-            Get started
-          </h2>
-          <Badge variant="outline" className="border-border/60 text-xs">
-            0/{onboardingTasks.length} complete
-          </Badge>
-        </div>
+        <SectionHeader
+          id="get-started-title"
+          title="Get started"
+          action={
+            <Badge variant="outline" className="border-border/60 text-xs">
+              0/{onboardingTasks.length} complete
+            </Badge>
+          }
+        />
         <DashboardPanel>
           <DashboardPanelContent className="space-y-4">
             {onboardingTasks.map((task) => (
@@ -256,14 +268,20 @@ function DashboardHome() {
       </section>
 
       <section aria-labelledby="recent-title" id="recent" className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 id="recent-title" className="text-sm font-medium text-muted-foreground">
-            Recent
-          </h2>
-          <Button variant="ghost" size="sm" className="text-muted-foreground" disabled>
-            View all
-          </Button>
-        </div>
+        <SectionHeader
+          id="recent-title"
+          title="Recent"
+          action={
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground"
+              disabled
+            >
+              View all
+            </Button>
+          }
+        />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {recentItems.map((item) => (
             <DashboardPanel key={item.title}>
@@ -282,14 +300,15 @@ function DashboardHome() {
 function ResumeTab() {
   return (
     <section aria-labelledby="resume-tab-title" className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 id="resume-tab-title" className="text-sm font-medium text-muted-foreground">
-          Resume
-        </h2>
-        <Badge variant="outline" className="border-border/60 text-xs">
-          No file uploaded
-        </Badge>
-      </div>
+      <SectionHeader
+        id="resume-tab-title"
+        title="Resume"
+        action={
+          <Badge variant="outline" className="border-border/60 text-xs">
+            No file uploaded
+          </Badge>
+        }
+      />
       <DashboardPanel>
         <DashboardPanelContent className="space-y-4">
           <div>

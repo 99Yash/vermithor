@@ -148,6 +148,17 @@ const ctaPanelClass =
 const ctaOrbClass =
   'pointer-events-none absolute left-1/2 top-1/2 -z-10 h-56 w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-b from-stone-400/8 via-stone-300/4 to-transparent blur-3xl opacity-60 dark:from-slate-400/7 dark:via-slate-300/3 dark:opacity-30';
 
+const PrimaryCtaButton = () => (
+  <Button asChild size="lg" className={primaryCtaClass}>
+    <Link href="/signin">
+      Get started
+      <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
+        →
+      </span>
+    </Link>
+  </Button>
+);
+
 const SectionHeader = ({
   eyebrow,
   title,
@@ -224,14 +235,7 @@ export function LandingClient() {
             </p>
           </div>
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" className={primaryCtaClass}>
-              <Link href="/signin">
-                Get started
-                <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-            </Button>
+            <PrimaryCtaButton />
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 dark:border-amber-200/10 dark:bg-slate-950/60 dark:text-amber-100/80">
@@ -360,14 +364,7 @@ export function LandingClient() {
               background.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button asChild size="lg" className={primaryCtaClass}>
-                <Link href="/signin">
-                  Get started
-                  <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </Link>
-              </Button>
+              <PrimaryCtaButton />
             </div>
           </section>
 
@@ -403,6 +400,8 @@ export function LandingClient() {
                       href={link.href}
                       target={isExternal ? '_blank' : undefined}
                       rel={isExternal ? 'noopener noreferrer' : undefined}
+                      aria-label={link.label}
+                      title={link.label}
                       className="group flex items-center gap-2 transition-colors hover:text-foreground"
                     >
                       <Icon className="h-5 w-5 transition-transform group-hover:scale-110" />

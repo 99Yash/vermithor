@@ -8,14 +8,18 @@ const trustedOrigins = [process.env.BETTER_AUTH_URL, process.env.CORS_ORIGIN].fi
   (origin): origin is string => Boolean(origin)
 );
 
-// Server-side auth instance (used in the backend auth server)
-// This instance has direct database access and handles authentication
 export const auth = betterAuth<BetterAuthOptions>({
   database: drizzleAdapter(db, {
     provider: 'pg',
     schema,
   }),
   baseURL: process.env.BETTER_AUTH_URL,
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 60,
+    },
+  },
   emailAndPassword: {
     enabled: true,
   },
@@ -39,8 +43,6 @@ export const auth = betterAuth<BetterAuthOptions>({
   },
 });
 
-// Auth client for Next.js Server Components/API routes
-// This makes HTTP calls to the auth server instead of connecting to the database
 export function createAuthServerClient(baseURL: string) {
   return betterAuth({
     baseURL,

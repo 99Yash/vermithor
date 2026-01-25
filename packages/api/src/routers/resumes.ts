@@ -101,45 +101,33 @@ export const resumesRouter = router({
         return { resumeId: record.id, status: record.status };
       }
 
+      const rejectUpload = async (message: string) => {
+        await deleteResumeObject({ key: record.s3Key });
+        await db
+          .update(resumeFile)
+          .set({ status: 'rejected' })
+          .where(eq(resumeFile.id, record.id));
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message,
+        });
+      };
+
       const head = await headResumeObject({ key: record.s3Key });
       const contentLength = head.ContentLength ?? 0;
       const contentType = head.ContentType ?? '';
 
       if (contentType !== PDF_CONTENT_TYPE) {
-        await deleteResumeObject({ key: record.s3Key });
-        await db
-          .update(resumeFile)
-          .set({ status: 'rejected' })
-          .where(eq(resumeFile.id, record.id));
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Uploaded file is not a PDF.',
-        });
+        await rejectUpload('Uploaded file is not a PDF.');
       }
 
       if (contentLength <= 0 || contentLength > env.AWS_S3_MAX_UPLOAD_BYTES) {
-        await deleteResumeObject({ key: record.s3Key });
-        await db
-          .update(resumeFile)
-          .set({ status: 'rejected' })
-          .where(eq(resumeFile.id, record.id));
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Uploaded file failed size validation.',
-        });
+        await rejectUpload('Uploaded file failed size validation.');
       }
 
       const header = await readResumeHeader({ key: record.s3Key });
       if (!assertPdfHeader(header)) {
-        await deleteResumeObject({ key: record.s3Key });
-        await db
-          .update(resumeFile)
-          .set({ status: 'rejected' })
-          .where(eq(resumeFile.id, record.id));
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'Uploaded file failed PDF validation.',
-        });
+        await rejectUpload('Uploaded file failed PDF validation.');
       }
 
       await db

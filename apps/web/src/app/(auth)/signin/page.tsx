@@ -1,16 +1,16 @@
 import type { Route } from 'next';
 import { redirect } from 'next/navigation';
 import { OAuthButtons } from '~/app/(auth)/signin/oauth-buttons';
-import { getServerSessionSnapshot } from '~/lib/auth/session';
+import { getServerSession } from '~/lib/auth/session';
 import { siteConfig } from '~/lib/site';
 import { EmailSignIn } from './email-signin';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AuthenticationPage() {
-  const { session, hasSessionCookie } = await getServerSessionSnapshot();
+  const session = await getServerSession();
 
-  if (session?.user || hasSessionCookie) {
+  if (session?.user) {
     redirect('/dashboard' as Route);
   }
 

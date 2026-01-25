@@ -150,7 +150,6 @@
     color: var(--accent-strong-foreground);
   }
 
-  /* Scrollbar styling */
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -173,7 +172,6 @@
     background-clip: padding-box;
   }
 
-  /* Firefox scrollbar */
   * {
     scrollbar-color: var(--border) transparent;
     scrollbar-width: thin;
@@ -183,7 +181,6 @@
     scrollbar-color: var(--scrollbar-thumb-hover) transparent;
   }
 
-  /* Text gradient utilities */
   .text-gradient {
     @apply bg-linear-to-r from-foreground via-foreground/90 to-foreground/80 bg-clip-text text-transparent;
   }
@@ -196,7 +193,6 @@
     @apply bg-linear-to-br from-foreground to-foreground/60 bg-clip-text text-transparent;
   }
 
-  /* Text highlights and emphasis */
   .text-highlight {
     @apply relative inline-block;
   }
@@ -210,7 +206,6 @@
     @apply relative inline-block rounded-md bg-linear-to-r from-amber-600/10 via-orange-500/10 to-amber-400/10 px-2 py-0.5 font-medium;
   }
 
-  /* Enhanced typography */
   .heading-xl {
     @apply text-6xl font-bold tracking-tighter sm:text-7xl lg:text-8xl;
     letter-spacing: -0.04em;
@@ -236,7 +231,6 @@
   }
 
 
-  /* Subtle glow effects */
   .glow-text {
     @apply drop-shadow-[0_0_15px_rgba(217,119,6,0.18)];
   }
@@ -245,12 +239,10 @@
     @apply drop-shadow-[0_0_25px_rgba(217,119,6,0.28)];
   }
 
-  /* Code-like styling for emphasis */
   .inline-code {
     @apply rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm font-medium text-foreground;
   }
 
-  /* Better link styling */
   .link-underline {
     @apply relative inline-block text-foreground/80 transition-colors hover:text-foreground;
   }
@@ -264,7 +256,6 @@
     @apply scale-x-100;
   }
 
-  /* Subtle animations */
   @keyframes shimmer {
     0% {
       background-position: -200% 0;
@@ -301,7 +292,6 @@
     }
   }
 
-  /* Better focus states */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
   }

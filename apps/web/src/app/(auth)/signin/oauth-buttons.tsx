@@ -4,12 +4,13 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '~/components/ui/button';
 import { Spinner } from '~/components/ui/spinner';
+import { useLastAuthMethod } from '~/hooks/use-last-auth-method';
 import { authClient } from '~/lib/auth/client';
 import type { AuthOptionsType, OAuthProviderId } from '~/lib/constants';
 import { getProviderById, OAUTH_PROVIDERS } from '~/lib/constants';
 import {
+  cn,
   getErrorMessage,
-  getLocalStorageItem,
   setLocalStorageItem,
 } from '~/lib/utils';
 
@@ -19,18 +20,10 @@ interface OAuthButtonProps {
 }
 
 const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
-  const [lastAuthMethod, setLastAuthMethod] =
-    React.useState<AuthOptionsType | null>(null);
+  const lastAuthMethod = useLastAuthMethod();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const provider = getProviderById(providerId);
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const lastAuthMethod = getLocalStorageItem('LAST_AUTH_METHOD');
-      setLastAuthMethod(lastAuthMethod ?? null);
-    }
-  }, []);
 
   const handleOAuthSignIn = React.useCallback(async () => {
     if (!provider) {
@@ -64,22 +57,16 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
     return null;
   }
 
-  const renderIcon = () => {
-    if (provider.icon) {
-      const IconComponent = provider.icon;
-      return <IconComponent className="size-5" />;
-    }
-    return null;
-  };
+  const IconComponent = provider.icon;
 
   return (
     <Button
       variant="outline"
-      className={`w-full relative ${className}`}
+      className={cn('w-full relative', className)}
       onClick={handleOAuthSignIn}
       disabled={isLoading}
     >
-      {renderIcon()}
+      {IconComponent ? <IconComponent className="size-5" /> : null}
       <span className="text-sm">
         {isLoading ? 'Signing in…' : `Continue with ${provider.name}`}
       </span>
@@ -100,7 +87,7 @@ export const OAuthButtons: React.FC<{
   className?: React.ComponentProps<typeof Button>['className'];
 }> = ({ className }) => {
   return (
-    <div className={`space-y-1 ${className}`}>
+    <div className={cn('space-y-1', className)}>
       {Object.values(OAUTH_PROVIDERS).map((provider) => (
         <OAuthButton
           key={provider.id}

@@ -8,6 +8,13 @@
       "when": 1769229530834,
       "tag": "0000_familiar_tarot",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769327191420,
+      "tag": "0001_faulty_the_twelve",
+      "breakpoints": true
     }
   ]
 }

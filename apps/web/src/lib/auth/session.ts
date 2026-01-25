@@ -1,46 +1,107 @@
-import { cookies } from 'next/headers';
-import { authServer } from '~/lib/auth/server';
-
-const COOKIE_PREFIX = 'vermithor__';
-const SESSION_COOKIE_NAMES = [
-  `${COOKIE_PREFIX}.session_token`,
-  `${COOKIE_PREFIX}session_token`,
-  'session_token',
-];
-
-type AuthCookieSnapshot = {
-  cookieHeader: string;
-  hasSessionCookie: boolean;
+import { headers } from 'next/headers';
+type SessionSnapshot = { user?: unknown } | null;
+type SessionCacheEntry = {
+  session: SessionSnapshot;
+  expiresAt: number;
 };
 
-export async function getAuthCookieSnapshot(): Promise<AuthCookieSnapshot> {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map(({ name, value }) => `${name}=${value}`)
-    .join('; ');
-  const hasSessionCookie = SESSION_COOKIE_NAMES.some((name) =>
-    Boolean(cookieStore.get(name))
-  );
+const SESSION_CACHE_TTL_MS = 30_000;
+const SESSION_TOKEN_SUFFIX = 'session_token';
+const sessionCache = new Map<string, SessionCacheEntry>();
 
-  return { cookieHeader, hasSessionCookie };
-}
-
-export async function getServerSession(cookieHeader?: string) {
-  const resolvedCookieHeader =
-    cookieHeader ?? (await getAuthCookieSnapshot()).cookieHeader;
-  const requestHeaders = new Headers();
-
-  if (resolvedCookieHeader) {
-    requestHeaders.set('cookie', resolvedCookieHeader);
+function getSessionToken(cookieHeader: string) {
+  if (!cookieHeader) {
+    return null;
   }
 
-  return authServer.api.getSession({ headers: requestHeaders });
+  const parts = cookieHeader.split(';');
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) {
+      continue;
+    }
+    const [name, ...valueParts] = trimmed.split('=');
+    if (!name || !name.endsWith(SESSION_TOKEN_SUFFIX)) {
+      continue;
+    }
+    return valueParts.join('=') || null;
+  }
+
+  return null;
 }
 
-export async function getServerSessionSnapshot() {
-  const snapshot = await getAuthCookieSnapshot();
-  const session = await getServerSession(snapshot.cookieHeader);
+export async function getServerSession() {
+  const requestHeaders = await headers();
+  const cookieHeader = requestHeaders.get('cookie') ?? '';
+  const sessionToken = getSessionToken(cookieHeader);
+  const hasSessionTokenCookie = Boolean(sessionToken);
+  const referer = requestHeaders.get('referer');
+  const requestId =
+    requestHeaders.get('x-request-id') ??
+    requestHeaders.get('x-vercel-id') ??
+    null;
+  const cached = sessionToken ? sessionCache.get(sessionToken) : undefined;
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.session;
+  }
 
-  return { session, ...snapshot };
+  if (cached && sessionToken) {
+    sessionCache.delete(sessionToken);
+  }
+  const serverUrl =
+    process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
+  const start = Date.now();
+  const response = await fetch(`${serverUrl}/api/auth/get-session`, {
+    method: 'GET',
+    headers: cookieHeader ? { cookie: cookieHeader } : undefined,
+    credentials: 'include',
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  const body = (await response.json().catch(() => null)) as
+    | Record<string, unknown>
+    | null;
+
+  if (!body) {
+    return null;
+  }
+
+  if ('user' in body) {
+    const session = body as SessionSnapshot;
+    if (sessionToken && session?.user) {
+      sessionCache.set(sessionToken, {
+        session,
+        expiresAt: Date.now() + SESSION_CACHE_TTL_MS,
+      });
+    }
+    return session;
+  }
+
+  if ('data' in body) {
+    const session = (body.data as SessionSnapshot) ?? null;
+    if (sessionToken && session?.user) {
+      sessionCache.set(sessionToken, {
+        session,
+        expiresAt: Date.now() + SESSION_CACHE_TTL_MS,
+      });
+    }
+    return session;
+  }
+
+  if ('session' in body) {
+    const session = (body.session as SessionSnapshot) ?? null;
+    if (sessionToken && session?.user) {
+      sessionCache.set(sessionToken, {
+        session,
+        expiresAt: Date.now() + SESSION_CACHE_TTL_MS,
+      });
+    }
+    return session;
+  }
+
+  return null;
 }
