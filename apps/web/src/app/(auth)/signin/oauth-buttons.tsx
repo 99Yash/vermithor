@@ -7,7 +7,11 @@ import { Spinner } from '~/components/ui/spinner';
 import { useLastAuthMethod } from '~/hooks/use-last-auth-method';
 import { authClient } from '~/lib/auth/client';
 import type { AuthOptionsType, OAuthProviderId } from '~/lib/constants';
-import { getProviderById, OAUTH_PROVIDERS } from '~/lib/constants';
+import {
+  getProviderById,
+  LAST_AUTH_METHOD_KEY,
+  OAUTH_PROVIDERS,
+} from '~/lib/constants';
 import {
   cn,
   getErrorMessage,
@@ -43,7 +47,7 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
       });
 
       setLocalStorageItem(
-        'LAST_AUTH_METHOD',
+        LAST_AUTH_METHOD_KEY,
         providerId.toUpperCase() as AuthOptionsType,
       );
     } catch (error) {

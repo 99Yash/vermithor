@@ -29,6 +29,7 @@ import {
   SheetTitle,
 } from '~/components/ui/sheet';
 import { authClient } from '~/lib/auth/client';
+import { route } from '~/lib/routes';
 import { siteConfig } from '~/lib/site';
 import { cn, getErrorMessage } from '~/lib/utils';
 
@@ -41,7 +42,7 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { id: 'home', label: 'Home', icon: Home, href: '/dashboard' as Route },
+  { id: 'home', label: 'Home', icon: Home, href: route('/dashboard') },
   { id: 'library', label: 'Library', icon: Library, disabled: true },
   { id: 'agent', label: 'Agent', icon: Sparkles, disabled: true },
 ];

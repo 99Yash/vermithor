@@ -9,6 +9,7 @@ import { Input } from '~/components/ui/input';
 import { Spinner } from '~/components/ui/spinner';
 import { useLastAuthMethod } from '~/hooks/use-last-auth-method';
 import { authClient } from '~/lib/auth/client';
+import { LAST_AUTH_METHOD_KEY } from '~/lib/constants';
 import { getErrorMessage, setLocalStorageItem } from '~/lib/utils';
 
 const signInSchema = z.object({
@@ -31,66 +32,63 @@ export function EmailSignIn() {
 
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleSignIn = React.useCallback(
-    async ({ email, password }: SignInPayload) => {
-      setIsLoading(true);
-      try {
-        const result = await authClient.signIn.email({
+  const persistLastAuthMethod = () => {
+    setLocalStorageItem(LAST_AUTH_METHOD_KEY, 'EMAIL');
+  };
+
+  const runAuth = async ({
+    action,
+    fallbackError,
+    successMessage,
+  }: {
+    action: () => Promise<{ error?: { message?: string } } | undefined>;
+    fallbackError: string;
+    successMessage: string;
+  }) => {
+    setIsLoading(true);
+    try {
+      const result = await action();
+      if (result?.error) {
+        toast.error(result.error.message ?? fallbackError);
+        return;
+      }
+
+      persistLastAuthMethod();
+      router.replace('/dashboard');
+      toast.success(successMessage);
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignIn = async ({ email, password }: SignInPayload) => {
+    await runAuth({
+      action: () =>
+        authClient.signIn.email({
           email,
           password,
           callbackURL: '/dashboard',
-        });
+        }),
+      fallbackError: 'Invalid email or password.',
+      successMessage: 'Successfully signed in!',
+    });
+  };
 
-        if (result?.error) {
-          toast.error(result.error.message ?? 'Invalid email or password.');
-          return;
-        }
-
-        if (typeof window !== 'undefined') {
-          setLocalStorageItem('LAST_AUTH_METHOD', 'EMAIL');
-        }
-
-        router.push('/dashboard');
-        toast.success('Successfully signed in!');
-      } catch (error) {
-        toast.error(getErrorMessage(error));
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [router],
-  );
-
-  const handleSignUp = React.useCallback(
-    async ({ email, password, name }: SignUpPayload) => {
-      setIsLoading(true);
-      try {
-        const result = await authClient.signUp.email({
+  const handleSignUp = async ({ email, password, name }: SignUpPayload) => {
+    await runAuth({
+      action: () =>
+        authClient.signUp.email({
           email,
           password,
           name,
           callbackURL: '/dashboard',
-        });
-
-        if (result?.error) {
-          toast.error(result.error.message ?? 'Sign up failed.');
-          return;
-        }
-
-        if (typeof window !== 'undefined') {
-          setLocalStorageItem('LAST_AUTH_METHOD', 'EMAIL');
-        }
-
-        router.push('/dashboard');
-        toast.success('Account created!');
-      } catch (error) {
-        toast.error(getErrorMessage(error));
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [router],
-  );
+        }),
+      fallbackError: 'Sign up failed.',
+      successMessage: 'Account created!',
+    });
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

@@ -5,12 +5,22 @@ import { FileText, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
-import { cn } from '~/lib/utils';
 import { trpc } from '~/lib/trpc';
+import { cn } from '~/lib/utils';
 
 type UploadStatus = 'idle' | 'uploading' | 'confirming' | 'success' | 'error';
 
 const PDF_CONTENT_TYPE = 'application/pdf';
+const STATUS_COPY: Record<UploadStatus, { text: string; tone: string }> = {
+  idle: { text: 'Ready to upload.', tone: 'text-muted-foreground' },
+  uploading: {
+    text: 'Uploading to secure storage...',
+    tone: 'text-muted-foreground',
+  },
+  confirming: { text: 'Verifying upload...', tone: 'text-muted-foreground' },
+  success: { text: 'Upload verified.', tone: 'text-emerald-600' },
+  error: { text: 'Upload failed.', tone: 'text-destructive' },
+};
 
 function formatBytes(bytes: number) {
   if (!Number.isFinite(bytes)) {
@@ -30,8 +40,12 @@ function formatBytes(bytes: number) {
   return `${size.toFixed(precision)} ${units[unitIndex]}`;
 }
 
-export default function ResumeUploadPage() {
-  const [files, setFiles] = useState<File[]>([]);
+type ResumeUploadClientProps = {
+  className?: string;
+};
+
+export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
+  const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<UploadStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -41,27 +55,10 @@ export default function ResumeUploadPage() {
     trpc.resumes.confirmUpload.mutationOptions(),
   );
 
-  const file = files[0] ?? null;
   const isBusy = status === 'uploading' || status === 'confirming';
   const isInvalid = Boolean(error);
 
-  const statusText =
-    status === 'uploading'
-      ? 'Uploading to secure storage...'
-      : status === 'confirming'
-        ? 'Verifying upload...'
-        : status === 'success'
-          ? 'Upload verified.'
-          : status === 'error'
-            ? 'Upload failed.'
-            : 'Ready to upload.';
-
-  const statusTone =
-    status === 'success'
-      ? 'text-emerald-600'
-      : status === 'error'
-        ? 'text-destructive'
-        : 'text-muted-foreground';
+  const { text: statusText, tone: statusTone } = STATUS_COPY[status];
 
   const isPdfFile = (candidate: File) =>
     candidate.type === PDF_CONTENT_TYPE ||
@@ -73,13 +70,13 @@ export default function ResumeUploadPage() {
     const [nextFile, ...extraFiles] = incoming;
 
     if (!isPdfFile(nextFile)) {
-      setFiles([]);
+      setFile(null);
       setStatus('idle');
       setError('Only PDF files are supported.');
       return;
     }
 
-    setFiles([nextFile]);
+    setFile(nextFile);
     setStatus('idle');
     setError(
       extraFiles.length > 0
@@ -107,25 +104,29 @@ export default function ResumeUploadPage() {
   const handleDropzoneKeyDown = (
     event: React.KeyboardEvent<HTMLDivElement>,
   ) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      openFileDialog();
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
     }
+
+    event.preventDefault();
+    if (isBusy) return;
+    openFileDialog();
   };
 
   const handleDragEnter = (event: React.DragEvent<HTMLDivElement>) => {
-    if (isBusy) return;
     event.preventDefault();
+    if (isBusy) return;
     setIsDragging(true);
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    if (isBusy) return;
     event.preventDefault();
+    if (isBusy) return;
     setIsDragging(true);
   };
 
   const handleDragLeave = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
     if (isBusy) return;
     const relatedTarget = event.relatedTarget;
     if (
@@ -139,15 +140,15 @@ export default function ResumeUploadPage() {
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
-    if (isBusy) return;
     event.preventDefault();
     setIsDragging(false);
+    if (isBusy) return;
     const incoming = Array.from(event.dataTransfer.files);
     applyFiles(incoming);
   };
 
   const handleRemoveFile = () => {
-    setFiles([]);
+    setFile(null);
     setStatus('idle');
     setError(null);
   };
@@ -158,18 +159,19 @@ export default function ResumeUploadPage() {
       return;
     }
 
-    if (file.type !== PDF_CONTENT_TYPE) {
+    if (!isPdfFile(file)) {
       setError('Only PDF files are supported.');
       return;
     }
 
+    const contentType = file.type || PDF_CONTENT_TYPE;
     setError(null);
     setStatus('uploading');
 
     try {
       const upload = await createUpload.mutateAsync({
         fileName: file.name,
-        contentType: file.type,
+        contentType,
         sizeBytes: file.size,
       });
 
@@ -200,102 +202,89 @@ export default function ResumeUploadPage() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-6 px-6 py-10">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Upload resume</h1>
-        <p className="text-sm text-muted-foreground">
-          PDF only. Stored privately and available to you only.
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <div
-          role="button"
-          tabIndex={isBusy ? -1 : 0}
-          aria-disabled={isBusy}
-          aria-invalid={isInvalid}
-          onClick={openFileDialog}
-          onKeyDown={handleDropzoneKeyDown}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-          className={cn(
-            'relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 text-center outline-none transition-colors',
-            'hover:bg-accent/30 focus-visible:border-ring/50 focus-visible:ring-ring/30 focus-visible:ring-[3px]',
-            isBusy && 'cursor-not-allowed opacity-60',
-            isDragging && 'border-primary/40 bg-accent/30',
-            isInvalid && 'border-destructive/60 bg-destructive/5',
-          )}
-        >
-          <div className="flex items-center justify-center rounded-full border bg-background p-2.5">
-            <Upload className="size-6 text-muted-foreground" />
-          </div>
-          <div className="flex flex-col items-center gap-1 text-center">
-            <p className="font-medium text-sm">Drag & drop your resume here</p>
-            <p className="text-muted-foreground text-xs">
-              Or click to browse (PDF only)
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-2 w-fit"
-            onClick={handleBrowseClick}
-            disabled={isBusy}
-          >
-            Browse files
-          </Button>
-          <Input
-            ref={fileInputRef}
-            type="file"
-            accept="application/pdf,.pdf"
-            onChange={handleFileChange}
-            disabled={isBusy}
-            className="sr-only"
-            tabIndex={-1}
-          />
+    <div className={cn('space-y-4', className)}>
+      <div
+        role="button"
+        tabIndex={isBusy ? -1 : 0}
+        aria-disabled={isBusy}
+        aria-invalid={isInvalid}
+        onClick={openFileDialog}
+        onKeyDown={handleDropzoneKeyDown}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className={cn(
+          'relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 text-center outline-none transition-colors',
+          'hover:bg-accent/30 focus-visible:border-ring/50 focus-visible:ring-ring/30 focus-visible:ring-[3px]',
+          isBusy && 'cursor-not-allowed opacity-60',
+          isDragging && 'border-primary/40 bg-accent/30',
+          isInvalid && 'border-destructive/60 bg-destructive/5',
+        )}
+      >
+        <div className="flex items-center justify-center rounded-full border bg-background p-2.5">
+          <Upload className="size-6 text-muted-foreground" />
         </div>
-
-        {file ? (
-          <div role="list" className="flex flex-col gap-2">
-            <div
-              role="listitem"
-              className="flex items-center gap-3 rounded-md border p-3"
-            >
-              <div className="flex size-10 items-center justify-center rounded border bg-accent/50">
-                <FileText className="size-5 text-muted-foreground" />
-              </div>
-              <div className="min-w-0 flex-1 space-y-1">
-                <p className="truncate text-sm font-medium">{file.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {formatBytes(file.size)}
-                </p>
-                <p className={cn('text-xs', statusTone)}>{statusText}</p>
-                {error ? (
-                  <p className="text-xs text-destructive">{error}</p>
-                ) : null}
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="size-8"
-                onClick={handleRemoveFile}
-                disabled={isBusy}
-              >
-                <X className="size-4" />
-                <span className="sr-only">Remove file</span>
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        {!file && error ? (
-          <p className="text-sm text-destructive">{error}</p>
-        ) : null}
+        <div className="flex flex-col items-center gap-1 text-center">
+          <p className="text-sm font-medium">Drag & drop your resume here</p>
+          <p className="text-xs text-muted-foreground">
+            Or click to browse (PDF only)
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-2 w-fit"
+          onClick={handleBrowseClick}
+          disabled={isBusy}
+        >
+          Browse files
+        </Button>
+        <Input
+          ref={fileInputRef}
+          type="file"
+          accept="application/pdf,.pdf"
+          onChange={handleFileChange}
+          disabled={isBusy}
+          className="sr-only"
+          tabIndex={-1}
+        />
       </div>
+
+      {file ? (
+        <div role="list" className="flex flex-col gap-2">
+          <div
+            role="listitem"
+            className="flex items-center gap-3 rounded-md border p-3"
+          >
+            <div className="flex size-10 items-center justify-center rounded border bg-accent/50">
+              <FileText className="size-5 text-muted-foreground" />
+            </div>
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="truncate text-sm font-medium">{file.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {formatBytes(file.size)}
+              </p>
+              <p className={cn('text-xs', statusTone)}>{statusText}</p>
+              {error ? <p className="text-xs text-destructive">{error}</p> : null}
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-8"
+              onClick={handleRemoveFile}
+              disabled={isBusy}
+            >
+              <X className="size-4" />
+              <span className="sr-only">Remove file</span>
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      {!file && error ? <p className="text-sm text-destructive">{error}</p> : null}
 
       <Button onClick={handleUpload} disabled={!file || isBusy}>
         {status === 'confirming'

@@ -1,5 +1,6 @@
 import type { Route } from 'next';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import {
   ArrowRight,
   CheckCircle2,
@@ -15,12 +16,13 @@ import {
   DashboardPanel,
   DashboardPanelContent,
 } from '~/components/dashboard/dashboard-panel';
+import { ResumeUploadClient } from '~/components/resumes/resume-upload-client';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { getServerSession } from '~/lib/auth/session';
+import { route } from '~/lib/routes';
 import { cn } from '~/lib/utils';
-
-const toRoute = (value: string) => value as Route;
 
 type QuickAction = {
   title: string;
@@ -35,13 +37,13 @@ const quickActions: QuickAction[] = [
     title: 'Upload resume',
     description: 'Add a PDF to kick off parsing.',
     icon: Upload,
-    href: toRoute('/resumes/upload'),
+    href: route('/dashboard?tab=resume'),
   },
   {
     title: 'Set targets',
     description: 'Define roles and locations to match.',
     icon: Target,
-    href: toRoute('/dashboard#get-started'),
+    href: route('/dashboard#get-started'),
   },
   {
     title: 'Start matching',
@@ -53,7 +55,7 @@ const quickActions: QuickAction[] = [
     title: 'Ask the agent',
     description: 'Draft and refine resume bullets.',
     icon: MessageSquare,
-    href: toRoute('/dashboard#agent'),
+    href: route('/dashboard#agent'),
   },
 ];
 
@@ -69,7 +71,7 @@ const onboardingTasks: OnboardingTask[] = [
   {
     title: 'Upload your resume',
     description: 'PDF only. We validate and parse it automatically.',
-    href: toRoute('/resumes/upload'),
+    href: route('/dashboard?tab=resume'),
     cta: 'Upload',
   },
   {
@@ -117,56 +119,64 @@ const recentItems: RecentItem[] = [
 const agentChips = ['Mentor', 'Resume mode', '250 words'];
 
 type DashboardPageProps = {
-  searchParams?: {
-    tab?: string;
-  };
+  searchParams?: { tab?: string } | Promise<{ tab?: string }>;
 };
 
 const dashboardTabs = [
-  { id: 'home', label: 'Home', href: toRoute('/dashboard') },
+  { id: 'home', label: 'Home', href: route('/dashboard') },
   {
     id: 'resume',
     label: 'Resume',
-    href: toRoute('/dashboard?tab=resume'),
+    href: route('/dashboard?tab=resume'),
   },
 ];
 
-export default function DashboardPage({ searchParams }: DashboardPageProps) {
-  const activeTab = searchParams?.tab === 'resume' ? 'resume' : 'home';
+export default async function DashboardPage({
+  searchParams,
+}: DashboardPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const session = await getServerSession();
+
+  if (!session?.user) {
+    redirect(route('/signin'));
+  }
+
+  const activeTab =
+    resolvedSearchParams?.tab === 'resume' ? 'resume' : 'home';
   const pageTitle = activeTab === 'resume' ? 'Resume' : 'Home';
 
   return (
     <div className="relative isolate space-y-8 pb-10">
       <div className="pointer-events-none absolute inset-x-0 top-[-120px] h-[220px] rounded-full bg-[radial-gradient(circle_at_center,oklch(0.95_0.06_95.6)_0%,transparent_70%)] blur-3xl dark:bg-[radial-gradient(circle_at_center,oklch(0.3_0.03_85)_0%,transparent_70%)] dark:opacity-50" />
 
-        <header className="relative flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              Dashboard
-            </p>
-            <h1 className="text-2xl font-semibold text-foreground">{pageTitle}</h1>
-          </div>
-          <Button variant="outline" size="sm">
-            Upgrade
-          </Button>
-        </header>
+      <header className="relative flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Dashboard
+          </p>
+          <h1 className="text-2xl font-semibold text-foreground">{pageTitle}</h1>
+        </div>
+        <Button variant="outline" size="sm">
+          Upgrade
+        </Button>
+      </header>
 
-        <nav className="flex flex-wrap items-center gap-2 text-sm">
-          {dashboardTabs.map((tab) => (
-            <Link
-              key={tab.id}
-              href={tab.href}
-              className={cn(
-                'rounded-full border px-3 py-1 text-xs font-medium transition',
-                activeTab === tab.id
-                  ? 'border-border bg-muted text-foreground'
-                  : 'border-transparent text-muted-foreground hover:border-border/60 hover:bg-muted/40',
-              )}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </nav>
+      <nav className="flex flex-wrap items-center gap-2 text-sm">
+        {dashboardTabs.map((tab) => (
+          <Link
+            key={tab.id}
+            href={tab.href}
+            className={cn(
+              'rounded-full border px-3 py-1 text-xs font-medium transition',
+              activeTab === tab.id
+                ? 'border-border bg-muted text-foreground'
+                : 'border-transparent text-muted-foreground hover:border-border/60 hover:bg-muted/40',
+            )}
+          >
+            {tab.label}
+          </Link>
+        ))}
+      </nav>
 
       {activeTab === 'resume' ? <ResumeTab /> : <DashboardHome />}
     </div>
@@ -318,14 +328,7 @@ function ResumeTab() {
               analysis.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button asChild>
-              <Link href={toRoute('/resumes/upload')}>Upload PDF</Link>
-            </Button>
-            <Button variant="outline" size="sm" disabled>
-              Import LinkedIn
-            </Button>
-          </div>
+          <ResumeUploadClient />
         </DashboardPanelContent>
       </DashboardPanel>
       <DashboardPanel>

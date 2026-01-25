@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { AuthOptionsType } from '~/lib/constants';
+import { LAST_AUTH_METHOD_KEY, type AuthOptionsType } from '~/lib/constants';
 import { getLocalStorageItem } from '~/lib/utils';
 
 export function useLastAuthMethod() {
@@ -11,7 +11,7 @@ export function useLastAuthMethod() {
       return;
     }
 
-    setLastAuthMethod(getLocalStorageItem('LAST_AUTH_METHOD') ?? null);
+    setLastAuthMethod(getLocalStorageItem(LAST_AUTH_METHOD_KEY) ?? null);
   }, []);
 
   return lastAuthMethod;

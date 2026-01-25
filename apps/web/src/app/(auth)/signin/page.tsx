@@ -1,7 +1,7 @@
-import type { Route } from 'next';
 import { redirect } from 'next/navigation';
 import { OAuthButtons } from '~/app/(auth)/signin/oauth-buttons';
 import { getServerSession } from '~/lib/auth/session';
+import { route } from '~/lib/routes';
 import { siteConfig } from '~/lib/site';
 import { EmailSignIn } from './email-signin';
 
@@ -11,7 +11,7 @@ export default async function AuthenticationPage() {
   const session = await getServerSession();
 
   if (session?.user) {
-    redirect('/dashboard' as Route);
+    redirect(route('/dashboard'));
   }
 
   return (
