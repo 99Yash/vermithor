@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { DragonLines } from '~/components/ornaments/dragon-lines';
@@ -147,6 +148,8 @@ const ctaPanelClass =
   'relative isolate flex flex-col items-center gap-4 py-12 text-center sm:py-14';
 const ctaOrbClass =
   'pointer-events-none absolute left-1/2 top-1/2 -z-10 h-56 w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-linear-to-b from-stone-400/8 via-stone-300/4 to-transparent blur-3xl opacity-60 dark:from-slate-400/7 dark:via-slate-300/3 dark:opacity-30';
+const revealStyle = (delayMs: number): CSSProperties =>
+  ({ '--reveal-delay': `${delayMs}ms` }) as CSSProperties;
 
 const PrimaryCtaButton = () => (
   <Button asChild size="lg" className={primaryCtaClass}>
@@ -205,7 +208,10 @@ export function LandingClient() {
       </div>
 
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-28 px-6 pb-20 pt-12 lg:px-10">
-        <header className="flex items-center justify-between gap-6">
+        <header
+          className="flex items-center justify-between gap-6 landing-reveal"
+          style={revealStyle(40)}
+        >
           <Link href="/" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-background/70 shadow-sm dark:border-amber-200/20 dark:bg-slate-950/60">
               <img
@@ -223,21 +229,36 @@ export function LandingClient() {
         <section className="relative isolate mx-auto flex max-w-5xl flex-col items-center gap-8 text-center lg:gap-10">
           <div aria-hidden="true" className={heroOrbClass} />
           <div className="space-y-6">
-            <p className={`${eyebrowClass} mx-auto w-fit`}>
+            <p
+              className={`${eyebrowClass} mx-auto w-fit landing-reveal`}
+              style={revealStyle(120)}
+            >
               Career matching, refined
             </p>
-            <h1 className={`text-balance ${heroTitleClass}`}>
+            <h1
+              className={`text-balance ${heroTitleClass} landing-reveal`}
+              style={revealStyle(200)}
+            >
               The matching workspace for focused career moves.
             </h1>
-            <p className={heroDescriptionClass}>
+            <p
+              className={`${heroDescriptionClass} landing-reveal`}
+              style={revealStyle(280)}
+            >
               Save thousands of hours searching and applying to roles you don't
               fit.
             </p>
           </div>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <div
+            className="flex flex-col items-center justify-center gap-4 sm:flex-row landing-reveal"
+            style={revealStyle(360)}
+          >
             <PrimaryCtaButton />
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
+          <div
+            className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground landing-reveal"
+            style={revealStyle(440)}
+          >
             <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 dark:border-amber-200/10 dark:bg-slate-950/60 dark:text-amber-100/80">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70 dark:bg-emerald-300/70" />
