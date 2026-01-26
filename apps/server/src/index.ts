@@ -6,26 +6,15 @@ import { node } from '@elysiajs/node';
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch';
 import 'dotenv/config';
 import { Elysia } from 'elysia';
+import { getServerEnv } from './env';
 
-const rawCorsOrigins = [
-  process.env.CORS_ORIGIN,
-  process.env.FRONTEND_URL,
-].filter(Boolean);
+const env = getServerEnv();
+const corsOrigins = new Set<string>([
+  ...env.CORS_ORIGIN,
+  ...env.FRONTEND_URL,
+]);
 
-const corsOrigins = new Set<string>();
-
-for (const value of rawCorsOrigins) {
-  if (value) {
-    for (const origin of value.split(',')) {
-      const trimmed = origin.trim();
-      if (trimmed) {
-        corsOrigins.add(trimmed);
-      }
-    }
-  }
-}
-
-if (process.env.NODE_ENV !== 'production') {
+if (env.NODE_ENV !== 'production') {
   corsOrigins.add('http://localhost:3000');
   corsOrigins.add('http://localhost:3001');
 }

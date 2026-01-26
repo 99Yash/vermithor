@@ -51,7 +51,7 @@
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.6658 0.1574 58.32);
+  --primary: oklch(0.74 0.145 70.08);
   --primary-foreground: oklch(0.141 0.005 285.823);
   --secondary: oklch(0.9619 0.0589 95.62);
   --secondary-foreground: oklch(0.21 0.006 285.885);
@@ -59,6 +59,8 @@
   --muted-foreground: oklch(0.552 0.016 285.938);
   --accent: oklch(0.9619 0.0589 95.62);
   --accent-foreground: oklch(0.21 0.006 285.885);
+  --accent-strong: var(--primary);
+  --accent-strong-foreground: var(--primary-foreground);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.92 0.004 286.32);
   --input: oklch(0.92 0.004 286.32);
@@ -71,7 +73,7 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.6658 0.1574 58.32);
+  --sidebar-primary: oklch(0.74 0.145 70.08);
   --sidebar-primary-foreground: oklch(0.141 0.005 285.823);
   --sidebar-accent: oklch(0.9619 0.0589 95.62);
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
@@ -94,6 +96,8 @@
   --muted-foreground: oklch(0.705 0.015 286.067);
   --accent: oklch(0.24 0.02 70);
   --accent-foreground: oklch(0.985 0 0);
+  --accent-strong: var(--primary);
+  --accent-strong-foreground: var(--primary-foreground);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -122,7 +126,41 @@
     @apply bg-background text-foreground;
   }
 
-  /* Scrollbar styling */
+  .app-shell-scroll {
+    overflow-y: scroll;
+  }
+
+  @supports (scrollbar-gutter: stable) {
+    .app-shell-scroll {
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+    }
+  }
+
+  input,
+  textarea,
+  [contenteditable='true'],
+  [contenteditable='plaintext-only'] {
+    caret-color: var(--accent-strong);
+  }
+
+  input[type='checkbox'],
+  input[type='radio'],
+  input[type='range'],
+  progress {
+    accent-color: var(--accent-strong);
+  }
+
+  ::selection {
+    background: var(--accent-strong);
+    color: var(--accent-strong-foreground);
+  }
+
+  ::-moz-selection {
+    background: var(--accent-strong);
+    color: var(--accent-strong-foreground);
+  }
+
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -145,7 +183,6 @@
     background-clip: padding-box;
   }
 
-  /* Firefox scrollbar */
   * {
     scrollbar-color: var(--border) transparent;
     scrollbar-width: thin;
@@ -155,7 +192,6 @@
     scrollbar-color: var(--scrollbar-thumb-hover) transparent;
   }
 
-  /* Text gradient utilities */
   .text-gradient {
     @apply bg-linear-to-r from-foreground via-foreground/90 to-foreground/80 bg-clip-text text-transparent;
   }
@@ -168,7 +204,6 @@
     @apply bg-linear-to-br from-foreground to-foreground/60 bg-clip-text text-transparent;
   }
 
-  /* Text highlights and emphasis */
   .text-highlight {
     @apply relative inline-block;
   }
@@ -182,7 +217,6 @@
     @apply relative inline-block rounded-md bg-linear-to-r from-amber-600/10 via-orange-500/10 to-amber-400/10 px-2 py-0.5 font-medium;
   }
 
-  /* Enhanced typography */
   .heading-xl {
     @apply text-6xl font-bold tracking-tighter sm:text-7xl lg:text-8xl;
     letter-spacing: -0.04em;
@@ -207,7 +241,7 @@
     text-wrap: pretty;
   }
 
-  /* Subtle glow effects */
+
   .glow-text {
     @apply drop-shadow-[0_0_15px_rgba(217,119,6,0.18)];
   }
@@ -216,12 +250,10 @@
     @apply drop-shadow-[0_0_25px_rgba(217,119,6,0.28)];
   }
 
-  /* Code-like styling for emphasis */
   .inline-code {
     @apply rounded-md bg-muted px-1.5 py-0.5 font-mono text-sm font-medium text-foreground;
   }
 
-  /* Better link styling */
   .link-underline {
     @apply relative inline-block text-foreground/80 transition-colors hover:text-foreground;
   }
@@ -235,7 +267,6 @@
     @apply scale-x-100;
   }
 
-  /* Subtle animations */
   @keyframes shimmer {
     0% {
       background-position: -200% 0;
@@ -248,6 +279,41 @@
   .shimmer {
     background-size: 200% 100%;
     animation: shimmer 8s linear infinite;
+  }
+
+  @keyframes landing-reveal {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes landing-fade {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .landing-reveal {
+    opacity: 0;
+    animation: landing-reveal 0.9s cubic-bezier(0.21, 0.61, 0.35, 1)
+      forwards;
+    animation-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .landing-fade {
+    opacity: 0;
+    animation: landing-fade 0.9s ease-out forwards;
+    animation-delay: var(--reveal-delay, 0ms);
+    will-change: opacity;
   }
 
   @keyframes dragon-drift {
@@ -267,13 +333,40 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .landing-reveal,
+    .landing-fade {
+      animation: none;
+      opacity: 1;
+    }
+
     .dragon-drift {
       animation: none;
     }
   }
 
-  /* Better focus states */
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+}
+
+@layer utilities {
+  @media (min-width: 1024px) {
+    .app-shell-outer:has([data-landing-root]) {
+      padding: 0;
+    }
+
+    .app-shell:has([data-landing-root]) {
+      border-color: transparent;
+      border-radius: 0;
+    }
+
+    .app-shell-outer:has([data-dashboard-root]) {
+      padding: 0;
+    }
+
+    .app-shell:has([data-dashboard-root]) {
+      border-color: transparent;
+      border-radius: 0;
+    }
   }
 }

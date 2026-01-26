@@ -1,11 +1,12 @@
 import { ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
+import { MainLayout } from '~/components/layouts/main';
 import { DragonLines } from '~/components/ornaments/dragon-lines';
 import { siteConfig } from '~/lib/site';
 
 export default function AuthLayout(props: { children: React.ReactNode }) {
   return (
-    <>
+    <MainLayout>
       <div className="relative h-full overflow-hidden bg-background">
         <div className="pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-linear-to-br from-amber-500/10 via-amber-300/5 to-transparent blur-3xl dark:from-amber-400/15 dark:via-amber-300/10" />
         <DragonLines className="opacity-60" />
@@ -20,6 +21,6 @@ export default function AuthLayout(props: { children: React.ReactNode }) {
           {props.children}
         </div>
       </div>
-    </>
+    </MainLayout>
   );
 }
