@@ -108,9 +108,16 @@ export function DashboardTabsClient({
         onValueChange={handleTabValueChange}
         className="gap-6 -mt-[7px]"
       >
-        <TabsList aria-label="Dashboard tabs">
+        <TabsList
+          aria-label="Dashboard tabs"
+          className="border border-border/60 bg-muted/70 dark:bg-muted/30"
+        >
           {dashboardTabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id}>
+            <TabsTrigger
+              key={tab.id}
+              value={tab.id}
+              className="text-xs font-semibold text-muted-foreground dark:text-muted-foreground/80 data-[state=active]:text-foreground dark:data-[state=active]:text-foreground data-[state=active]:bg-background/90 dark:data-[state=active]:bg-background/50"
+            >
               {tab.label}
             </TabsTrigger>
           ))}
