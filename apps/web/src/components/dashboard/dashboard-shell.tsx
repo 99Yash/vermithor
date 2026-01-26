@@ -126,8 +126,11 @@ export function DashboardShell({
 
   return (
     <DashboardShellContext.Provider value={contextValue}>
-      <div className="h-svh bg-background overflow-hidden" data-dashboard-root>
-        <div className="mx-auto box-border flex h-full w-full max-w-7xl gap-8 px-0 py-0 sm:px-4 lg:px-6 lg:py-6">
+      <div
+        className="h-svh bg-background overflow-hidden sm:overflow-x-hidden sm:overflow-y-auto"
+        data-dashboard-root
+      >
+        <div className="mx-auto box-border flex h-full w-full max-w-7xl gap-8 px-0 py-0 sm:px-4 lg:px-6 lg:py-6 sm:h-auto sm:min-h-full">
           <aside
             className={cn(
               'sticky top-6 hidden h-[calc(100svh-3rem)] shrink-0 flex-col gap-6 self-start pb-4 transition-[width] duration-200 lg:flex lg:h-[calc(100svh-4rem-2px)]',
@@ -141,9 +144,9 @@ export function DashboardShell({
 
           <main className="flex-1 min-w-0 min-h-0">
             <AppShell
-              outerClassName="h-full lg:p-0"
-              innerClassName="border-border/60"
-              scrollClassName="pb-6 pt-4 lg:py-6"
+              outerClassName="h-full lg:p-0 sm:h-auto"
+              innerClassName="border-border/60 sm:h-auto"
+              scrollClassName="pb-6 pt-4 sm:flex-none sm:overflow-visible lg:py-6"
             >
               <div className="px-4 lg:px-6">
                 <div className="mb-4 flex items-center gap-3 lg:hidden">

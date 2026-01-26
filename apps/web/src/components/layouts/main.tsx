@@ -31,7 +31,12 @@ export function AppShell({
           innerClassName,
         )}
       >
-        <div className={cn('app-shell-scroll flex-1 overflow-auto', scrollClassName)}>
+        <div
+          className={cn(
+            'app-shell-scroll flex-1 overflow-auto',
+            scrollClassName,
+          )}
+        >
           {children}
         </div>
       </div>
