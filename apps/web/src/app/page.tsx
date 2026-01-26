@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { LandingClient } from '~/components/landing/landing-client';
+import { MainLayout } from '~/components/layouts/main';
 import { getServerSession } from '~/lib/auth/session';
 import { route } from '~/lib/routes';
 
@@ -12,5 +13,9 @@ export default async function Home() {
     redirect(route('/dashboard'));
   }
 
-  return <LandingClient />;
+  return (
+    <MainLayout>
+      <LandingClient />
+    </MainLayout>
+  );
 }

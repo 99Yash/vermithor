@@ -126,6 +126,17 @@
     @apply bg-background text-foreground;
   }
 
+  .app-shell-scroll {
+    overflow-y: scroll;
+  }
+
+  @supports (scrollbar-gutter: stable) {
+    .app-shell-scroll {
+      overflow-y: auto;
+      scrollbar-gutter: stable;
+    }
+  }
+
   input,
   textarea,
   [contenteditable='true'],

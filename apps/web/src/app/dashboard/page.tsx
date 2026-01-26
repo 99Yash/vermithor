@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { DashboardTabsClient } from '~/components/dashboard/dashboard-tabs-client';
 import {
   DashboardPanel,
   DashboardPanelContent,
@@ -29,6 +30,8 @@ type QuickAction = {
   description: string;
   icon: LucideIcon;
   href?: Route;
+  tabTarget?: 'home' | 'resume';
+  scrollTarget?: string;
   badge?: string;
 };
 
@@ -37,13 +40,13 @@ const quickActions: QuickAction[] = [
     title: 'Upload resume',
     description: 'Add a PDF to kick off parsing.',
     icon: Upload,
-    href: route('/dashboard?tab=resume'),
+    tabTarget: 'resume',
   },
   {
     title: 'Set targets',
     description: 'Define roles and locations to match.',
     icon: Target,
-    href: route('/dashboard#get-started'),
+    scrollTarget: 'get-started',
   },
   {
     title: 'Start matching',
@@ -55,7 +58,7 @@ const quickActions: QuickAction[] = [
     title: 'Ask the agent',
     description: 'Draft and refine resume bullets.',
     icon: MessageSquare,
-    href: route('/dashboard#agent'),
+    scrollTarget: 'agent',
   },
 ];
 
@@ -63,6 +66,8 @@ type OnboardingTask = {
   title: string;
   description: string;
   href?: Route;
+  tabTarget?: 'home' | 'resume';
+  scrollTarget?: string;
   done?: boolean;
   cta?: string;
 };
@@ -71,7 +76,7 @@ const onboardingTasks: OnboardingTask[] = [
   {
     title: 'Upload your resume',
     description: 'PDF only. We validate and parse it automatically.',
-    href: route('/dashboard?tab=resume'),
+    tabTarget: 'resume',
     cta: 'Upload',
   },
   {
@@ -122,15 +127,6 @@ type DashboardPageProps = {
   searchParams?: { tab?: string } | Promise<{ tab?: string }>;
 };
 
-const dashboardTabs = [
-  { id: 'home', label: 'Home', href: route('/dashboard') },
-  {
-    id: 'resume',
-    label: 'Resume',
-    href: route('/dashboard?tab=resume'),
-  },
-];
-
 export default async function DashboardPage({
   searchParams,
 }: DashboardPageProps) {
@@ -141,45 +137,15 @@ export default async function DashboardPage({
     redirect(route('/signin'));
   }
 
-  const activeTab =
+  const initialTab =
     resolvedSearchParams?.tab === 'resume' ? 'resume' : 'home';
-  const pageTitle = activeTab === 'resume' ? 'Resume' : 'Home';
 
   return (
-    <div className="relative isolate space-y-8 pb-10">
-      <div className="pointer-events-none absolute inset-x-0 top-[-120px] h-[220px] rounded-full bg-[radial-gradient(circle_at_center,oklch(0.95_0.06_95.6)_0%,transparent_70%)] blur-3xl dark:bg-[radial-gradient(circle_at_center,oklch(0.3_0.03_85)_0%,transparent_70%)] dark:opacity-50" />
-
-      <header className="relative flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Dashboard
-          </p>
-          <h1 className="text-2xl font-semibold text-foreground">{pageTitle}</h1>
-        </div>
-        <Button variant="outline" size="sm">
-          Upgrade
-        </Button>
-      </header>
-
-      <nav className="flex flex-wrap items-center gap-2 text-sm">
-        {dashboardTabs.map((tab) => (
-          <Link
-            key={tab.id}
-            href={tab.href}
-            className={cn(
-              'rounded-full border px-3 py-1 text-xs font-medium transition',
-              activeTab === tab.id
-                ? 'border-border bg-muted text-foreground'
-                : 'border-transparent text-muted-foreground hover:border-border/60 hover:bg-muted/40',
-            )}
-          >
-            {tab.label}
-          </Link>
-        ))}
-      </nav>
-
-      {activeTab === 'resume' ? <ResumeTab /> : <DashboardHome />}
-    </div>
+    <DashboardTabsClient
+      initialTab={initialTab}
+      home={<DashboardHome />}
+      resume={<ResumeTab />}
+    />
   );
 }
 
@@ -202,7 +168,7 @@ function SectionHeader({ id, title, action }: SectionHeaderProps) {
 
 function DashboardHome() {
   return (
-    <>
+    <div className="space-y-8">
       <section aria-labelledby="quick-actions-title" className="space-y-3">
         <SectionHeader id="quick-actions-title" title="Quick actions" />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -303,7 +269,7 @@ function DashboardHome() {
           ))}
         </div>
       </section>
-    </>
+    </div>
   );
 }
 
@@ -348,8 +314,10 @@ function ResumeTab() {
 
 function ActionCard({ action }: { action: QuickAction }) {
   const cardClassName = cn(
-    'group flex h-full flex-col justify-between rounded-xl border border-border/60 bg-card p-4 shadow-xs transition',
-    action.href ? 'hover:-translate-y-0.5 hover:shadow-md' : 'opacity-70'
+    'group flex h-full w-full flex-col justify-between rounded-xl border border-border/60 bg-card p-4 text-left shadow-xs transition',
+    action.href || action.tabTarget || action.scrollTarget
+      ? 'cursor-pointer hover:-translate-y-0.5 hover:shadow-md'
+      : 'opacity-70',
   );
 
   const content = (
@@ -372,6 +340,30 @@ function ActionCard({ action }: { action: QuickAction }) {
       </div>
     </>
   );
+
+  if (action.tabTarget) {
+    return (
+      <button
+        type="button"
+        data-tab-target={action.tabTarget}
+        className={cardClassName}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  if (action.scrollTarget) {
+    return (
+      <button
+        type="button"
+        data-scroll-target={action.scrollTarget}
+        className={cardClassName}
+      >
+        {content}
+      </button>
+    );
+  }
 
   if (action.href) {
     return (
@@ -398,6 +390,10 @@ function ChecklistItem({ task }: { task: OnboardingTask }) {
     </span>
   );
 
+  const isInteractive = Boolean(
+    task.href || task.tabTarget || task.scrollTarget,
+  );
+
   const content = (
     <>
       <div className="flex items-start gap-3">
@@ -407,7 +403,7 @@ function ChecklistItem({ task }: { task: OnboardingTask }) {
           <p className="text-xs text-muted-foreground">{task.description}</p>
         </div>
       </div>
-      {task.href ? (
+      {isInteractive ? (
         ctaPill
       ) : (
         <Button variant="outline" size="sm" className="h-7" disabled>
@@ -417,19 +413,45 @@ function ChecklistItem({ task }: { task: OnboardingTask }) {
     </>
   );
 
+  const wrapperClassName = cn(
+    'group flex w-full items-center justify-between gap-4 rounded-lg border border-border/60 bg-muted/30 px-3 py-3 text-left',
+    isInteractive && 'transition hover:bg-muted/50',
+  );
+
+  if (task.tabTarget) {
+    return (
+      <button
+        type="button"
+        data-tab-target={task.tabTarget}
+        className={wrapperClassName}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  if (task.scrollTarget) {
+    return (
+      <button
+        type="button"
+        data-scroll-target={task.scrollTarget}
+        className={wrapperClassName}
+      >
+        {content}
+      </button>
+    );
+  }
+
   if (task.href) {
     return (
-      <Link
-        href={task.href}
-        className="group flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-muted/30 px-3 py-3 transition hover:bg-muted/50"
-      >
+      <Link href={task.href} className={wrapperClassName}>
         {content}
       </Link>
     );
   }
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border border-border/60 bg-muted/30 px-3 py-3">
+    <div className={wrapperClassName} aria-disabled="true">
       {content}
     </div>
   );

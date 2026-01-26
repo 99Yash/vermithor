@@ -45,6 +45,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '~/components/ui/sheet';
+import { AppShell } from '~/components/layouts/main';
 import { authClient } from '~/lib/auth/client';
 import { route } from '~/lib/routes';
 import { siteConfig } from '~/lib/site';
@@ -89,8 +90,8 @@ export function DashboardShell({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-full bg-background" data-dashboard-root>
-      <div className="mx-auto flex w-full max-w-7xl gap-8 px-4 py-6 lg:px-6">
+    <div className="h-svh bg-background overflow-hidden" data-dashboard-root>
+      <div className="mx-auto box-border flex h-full w-full max-w-7xl gap-8 px-0 py-0 sm:px-4 lg:px-6 lg:py-6">
         <aside
           className={cn(
             'sticky top-6 hidden h-[calc(100svh-3rem)] shrink-0 flex-col gap-6 self-start pb-4 transition-[width] duration-200 lg:flex lg:h-[calc(100svh-4rem-2px)]',
@@ -107,34 +108,44 @@ export function DashboardShell({
           <SidebarSections collapsed={collapsed} activeNav={activeNav} />
         </aside>
 
-        <main className="flex-1 min-w-0">
-          <div className="mb-4 flex items-center gap-3 lg:hidden">
-            <DashboardSidebarToggle
-              collapsed={false}
-              onToggle={() => setMobileOpen(true)}
-              label="Open sidebar"
-            />
-            <div>
-              <p className="text-sm font-semibold leading-tight">
-                {siteConfig.name}
-              </p>
-              <p className="text-xs text-muted-foreground">Dashboard</p>
+        <main className="flex-1 min-w-0 min-h-0">
+          <AppShell
+            outerClassName="h-full lg:p-0"
+            innerClassName="border-border/60"
+            scrollClassName="pb-6 pt-4 lg:py-6"
+          >
+            <div className="px-4 lg:px-6">
+              <div className="mb-4 flex items-center gap-3 lg:hidden">
+                <DashboardSidebarToggle
+                  collapsed={false}
+                  onToggle={() => setMobileOpen(true)}
+                  label="Open sidebar"
+                />
+                <div>
+                  <p className="text-sm font-semibold leading-tight">
+                    {siteConfig.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Dashboard</p>
+                </div>
+              </div>
+              {children}
             </div>
-          </div>
-          {children}
+          </AppShell>
         </main>
       </div>
 
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent side="left" className="w-72 bg-background p-4">
-          <SheetHeader className="space-y-1">
-            <SheetTitle className="text-sm font-semibold">
-              {siteConfig.name}
-            </SheetTitle>
-            <SheetDescription className="text-xs">
-              Dashboard navigation
-            </SheetDescription>
+        <SheetContent
+          side="left"
+          className="w-72 bg-background p-4 [&>button]:hidden"
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Dashboard navigation</SheetTitle>
+            <SheetDescription>Access your dashboard sections.</SheetDescription>
           </SheetHeader>
+          <div className="flex items-center justify-between">
+            <SidebarUserMenu collapsed={false} />
+          </div>
           <div className="mt-6 flex h-full flex-col">
             <SidebarSections collapsed={false} activeNav={activeNav} />
           </div>
@@ -168,7 +179,7 @@ function SidebarSections({
 }) {
   return (
     <div className="flex h-full flex-col gap-6">
-      <nav className="space-y-1">
+      <nav className="space-y-1" aria-label="Dashboard">
         {navItems.map((item) => (
           <NavItemLink
             key={item.id}
