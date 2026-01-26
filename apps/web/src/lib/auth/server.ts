@@ -1,6 +1,4 @@
 import { createAuthServerClient } from '@vermithor/auth';
+import { serverUrl } from '~/lib/env';
 
-const SERVER_URL =
-  process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001';
-
-export const authServer = createAuthServerClient(SERVER_URL);
+export const authServer = createAuthServerClient(serverUrl);

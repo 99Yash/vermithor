@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import { useDashboardShell } from '~/components/dashboard/dashboard-shell';
+import { DashboardSidebarToggle } from '~/components/dashboard/sidebar-toggle';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 
 type DashboardTab = 'home' | 'resume';
@@ -24,6 +26,7 @@ export function DashboardTabsClient({
   home,
   resume,
 }: DashboardTabsClientProps) {
+  const { collapsed, toggleCollapsed } = useDashboardShell();
   const [activeTab, setActiveTab] = useState<DashboardTab>(initialTab);
 
   useEffect(() => {
@@ -99,9 +102,17 @@ export function DashboardTabsClient({
     <div className="relative isolate space-y-8 pb-10">
       <div className="pointer-events-none absolute inset-x-0 top-[-120px] h-[220px] rounded-full bg-[radial-gradient(circle_at_center,oklch(0.95_0.06_95.6)_0%,transparent_70%)] blur-3xl dark:bg-[radial-gradient(circle_at_center,oklch(0.3_0.03_85)_0%,transparent_70%)] dark:opacity-50" />
 
-      <h1 className="text-lg tracking-tight font-semibold text-foreground">
-        {pageTitle}
-      </h1>
+      <div className="flex items-center gap-3">
+        <div className="hidden lg:flex">
+          <DashboardSidebarToggle
+            collapsed={collapsed}
+            onToggle={toggleCollapsed}
+          />
+        </div>
+        <h1 className="text-lg tracking-tight font-semibold text-foreground">
+          {pageTitle}
+        </h1>
+      </div>
 
       <Tabs
         value={activeTab}

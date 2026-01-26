@@ -2,10 +2,12 @@ import { db } from '@vermithor/db';
 import * as schema from '@vermithor/db/schema/auth';
 import { betterAuth, type BetterAuthOptions } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { getAuthEnv } from './env';
 
-const isProduction = process.env.NODE_ENV === 'production';
-const trustedOrigins = [process.env.BETTER_AUTH_URL, process.env.CORS_ORIGIN].filter(
-  (origin): origin is string => Boolean(origin)
+const env = getAuthEnv();
+const isProduction = env.NODE_ENV === 'production';
+const trustedOrigins = Array.from(
+  new Set([env.BETTER_AUTH_URL, ...env.CORS_ORIGIN])
 );
 
 export const auth = betterAuth<BetterAuthOptions>({
@@ -13,7 +15,7 @@ export const auth = betterAuth<BetterAuthOptions>({
     provider: 'pg',
     schema,
   }),
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: env.BETTER_AUTH_URL,
   session: {
     cookieCache: {
       enabled: true,
@@ -28,8 +30,8 @@ export const auth = betterAuth<BetterAuthOptions>({
     google: {
       display: 'popup',
       prompt: 'select_account',
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
   advanced: {

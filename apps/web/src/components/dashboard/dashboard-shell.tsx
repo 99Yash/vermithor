@@ -19,7 +19,15 @@ import {
 import type { Route } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState, type ComponentProps, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from 'react';
 import { toast } from 'sonner';
 import {
   DashboardPanel,
@@ -82,81 +90,100 @@ type DashboardShellProps = {
   children: ReactNode;
 };
 
+type DashboardShellContextValue = {
+  collapsed: boolean;
+  toggleCollapsed: () => void;
+};
+
+const DashboardShellContext = createContext<DashboardShellContextValue | null>(
+  null,
+);
+
+export function useDashboardShell() {
+  const context = useContext(DashboardShellContext);
+  if (!context) {
+    throw new Error('useDashboardShell must be used within DashboardShell.');
+  }
+  return context;
+}
+
 export function DashboardShell({
   activeNav = 'home',
   children,
 }: DashboardShellProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((prev) => !prev);
+  }, []);
+  const contextValue = useMemo(
+    () => ({
+      collapsed,
+      toggleCollapsed,
+    }),
+    [collapsed, toggleCollapsed],
+  );
 
   return (
-    <div className="h-svh bg-background overflow-hidden" data-dashboard-root>
-      <div className="mx-auto box-border flex h-full w-full max-w-7xl gap-8 px-0 py-0 sm:px-4 lg:px-6 lg:py-6">
-        <aside
-          className={cn(
-            'sticky top-6 hidden h-[calc(100svh-3rem)] shrink-0 flex-col gap-6 self-start pb-4 transition-[width] duration-200 lg:flex lg:h-[calc(100svh-4rem-2px)]',
-            collapsed ? 'w-16 items-center' : 'w-60',
-          )}
-        >
-          <SidebarBrand collapsed={collapsed} />
-
-          <SidebarSections collapsed={collapsed} activeNav={activeNav} />
-        </aside>
-
-        <main className="flex-1 min-w-0 min-h-0">
-          <AppShell
-            outerClassName="h-full lg:p-0"
-            innerClassName="border-border/60"
-            scrollClassName="pb-6 pt-4 lg:py-6"
+    <DashboardShellContext.Provider value={contextValue}>
+      <div className="h-svh bg-background overflow-hidden" data-dashboard-root>
+        <div className="mx-auto box-border flex h-full w-full max-w-7xl gap-8 px-0 py-0 sm:px-4 lg:px-6 lg:py-6">
+          <aside
+            className={cn(
+              'sticky top-6 hidden h-[calc(100svh-3rem)] shrink-0 flex-col gap-6 self-start pb-4 transition-[width] duration-200 lg:flex lg:h-[calc(100svh-4rem-2px)]',
+              collapsed ? 'w-16 items-center' : 'w-60',
+            )}
           >
-            <div className="px-4 lg:px-6">
-              <div className="mb-4 flex items-center gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="lg:hidden">
-                    <DashboardSidebarToggle
-                      collapsed={false}
-                      onToggle={() => setMobileOpen(true)}
-                      label="Open sidebar"
-                    />
-                  </div>
-                  <div className="hidden lg:flex">
-                    <DashboardSidebarToggle
-                      collapsed={collapsed}
-                      onToggle={() => setCollapsed((prev) => !prev)}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-0.5">
-                  <p className="text-sm font-semibold leading-tight">
-                    {siteConfig.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Dashboard</p>
-                </div>
-              </div>
-              {children}
-            </div>
-          </AppShell>
-        </main>
-      </div>
+            <SidebarBrand collapsed={collapsed} />
 
-      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent
-          side="left"
-          className="w-72 bg-background p-4 [&>button]:hidden"
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Dashboard navigation</SheetTitle>
-            <SheetDescription>Access your dashboard sections.</SheetDescription>
-          </SheetHeader>
-          <div className="flex items-center justify-between">
-            <SidebarUserMenu collapsed={false} />
-          </div>
-          <div className="mt-6 flex h-full flex-col">
-            <SidebarSections collapsed={false} activeNav={activeNav} />
-          </div>
-        </SheetContent>
-      </Sheet>
-    </div>
+            <SidebarSections collapsed={collapsed} activeNav={activeNav} />
+          </aside>
+
+          <main className="flex-1 min-w-0 min-h-0">
+            <AppShell
+              outerClassName="h-full lg:p-0"
+              innerClassName="border-border/60"
+              scrollClassName="pb-6 pt-4 lg:py-6"
+            >
+              <div className="px-4 lg:px-6">
+                <div className="mb-4 flex items-center gap-3 lg:hidden">
+                  <DashboardSidebarToggle
+                    collapsed={false}
+                    onToggle={() => setMobileOpen(true)}
+                    label="Open sidebar"
+                  />
+                  <div>
+                    <p className="text-sm font-semibold leading-tight">
+                      {siteConfig.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Dashboard</p>
+                  </div>
+                </div>
+                {children}
+              </div>
+            </AppShell>
+          </main>
+        </div>
+
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetContent
+            side="left"
+            className="w-72 bg-background p-4 [&>button]:hidden"
+          >
+            <SheetHeader className="sr-only">
+              <SheetTitle>Dashboard navigation</SheetTitle>
+              <SheetDescription>Access your dashboard sections.</SheetDescription>
+            </SheetHeader>
+            <div className="flex items-center justify-between">
+              <SidebarUserMenu collapsed={false} />
+            </div>
+            <div className="mt-6 flex h-full flex-col">
+              <SidebarSections collapsed={false} activeNav={activeNav} />
+            </div>
+          </SheetContent>
+        </Sheet>
+      </div>
+    </DashboardShellContext.Provider>
   );
 }
 
