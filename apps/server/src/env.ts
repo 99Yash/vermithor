@@ -13,12 +13,14 @@ const csvUrlListSchema = z
       .map((origin) => origin.trim())
       .filter(Boolean);
   })
-  .pipe(z.array(z.string().url()));
+  .pipe(z.array(z.url()));
 
 const serverEnvSchema = z.object({
   CORS_ORIGIN: csvUrlListSchema,
   FRONTEND_URL: csvUrlListSchema,
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
 });
 
 export function getServerEnv() {

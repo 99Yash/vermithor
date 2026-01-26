@@ -1,15 +1,30 @@
 'use client';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import {
+  Controller,
+  type FieldPath,
+  type Resolver,
+  useForm,
+} from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod/v4';
 import { Button } from '~/components/ui/button';
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '~/components/ui/field';
 import { Input } from '~/components/ui/input';
 import { Spinner } from '~/components/ui/spinner';
 import { useLastAuthMethod } from '~/hooks/use-last-auth-method';
 import { authClient } from '~/lib/auth/client';
 import { LAST_AUTH_METHOD_KEY } from '~/lib/constants';
+import { route } from '~/lib/routes';
 import { getErrorMessage, setLocalStorageItem } from '~/lib/utils';
 
 const signInSchema = z.object({
@@ -24,13 +39,27 @@ const signUpSchema = signInSchema.extend({
 type SignInPayload = z.infer<typeof signInSchema>;
 type SignUpPayload = z.infer<typeof signUpSchema>;
 type AuthMode = 'signin' | 'signup';
+type AuthFormValues = SignInPayload & { name?: string };
 
 export function EmailSignIn() {
   const router = useRouter();
   const lastAuthMethod = useLastAuthMethod();
   const [mode, setMode] = React.useState<AuthMode>('signin');
 
-  const [isLoading, setIsLoading] = React.useState(false);
+  const authSchema = React.useMemo(
+    () => (mode === 'signup' ? signUpSchema : signInSchema),
+    [mode],
+  );
+  const form = useForm<AuthFormValues>({
+    resolver: zodResolver(authSchema) as Resolver<AuthFormValues>,
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+    shouldUnregister: true,
+  });
+  const isSubmitting = form.formState.isSubmitting;
   const buttonLabel =
     mode === 'signup' ? 'Create account' : 'Sign In with Email';
   const loadingLabel =
@@ -45,11 +74,10 @@ export function EmailSignIn() {
     fallbackError,
     successMessage,
   }: {
-    action: () => Promise<{ error?: { message?: string } } | undefined>;
+    action: () => Promise<{ error?: { message?: string } | null } | undefined>;
     fallbackError: string;
     successMessage: string;
   }) => {
-    setIsLoading(true);
     try {
       const result = await action();
       if (result?.error) {
@@ -58,12 +86,10 @@ export function EmailSignIn() {
       }
 
       persistLastAuthMethod();
-      router.replace('/dashboard');
+      router.replace(route('/dashboard'));
       toast.success(successMessage);
     } catch (error) {
       toast.error(getErrorMessage(error));
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -73,7 +99,7 @@ export function EmailSignIn() {
         authClient.signIn.email({
           email,
           password,
-          callbackURL: '/dashboard',
+          callbackURL: route('/dashboard'),
         }),
       fallbackError: 'Invalid email or password.',
       successMessage: 'Successfully signed in!',
@@ -87,75 +113,105 @@ export function EmailSignIn() {
           email,
           password,
           name,
-          callbackURL: '/dashboard',
+          callbackURL: route('/dashboard'),
         }),
       fallbackError: 'Sign up failed.',
       successMessage: 'Account created!',
     });
   };
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-
-    const schema = mode === 'signup' ? signUpSchema : signInSchema;
-    const { success, data, error } = schema.safeParse(
-      Object.fromEntries(formData),
-    );
-
-    if (!success) {
-      toast.error(error.message);
-      return;
-    }
-
+  const handleFormSubmit = form.handleSubmit(async (data) => {
     if (mode === 'signup') {
-      await handleSignUp(data);
+      await handleSignUp(signUpSchema.parse(data));
       return;
     }
 
-    await handleSignIn(data);
-  }
+    await handleSignIn(signInSchema.parse(data));
+  });
+
+  const renderInput = ({
+    name,
+    label,
+    placeholder,
+    type = 'text',
+    autoComplete,
+    autoCapitalize,
+    autoCorrect,
+  }: {
+    name: FieldPath<AuthFormValues>;
+    label: string;
+    placeholder?: string;
+    type?: React.ComponentProps<typeof Input>['type'];
+    autoComplete?: string;
+    autoCapitalize?: string;
+    autoCorrect?: string;
+  }) => (
+    <Controller
+      name={name}
+      control={form.control}
+      render={({ field, fieldState }) => {
+        const { ref: _ref, ...fieldProps } = field;
+        const inputId = `auth-${name}`;
+
+        return (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel className="sr-only" htmlFor={inputId}>
+              {label}
+            </FieldLabel>
+            <FieldContent>
+              <Input
+                {...fieldProps}
+                id={inputId}
+                type={type}
+                placeholder={placeholder}
+                autoComplete={autoComplete}
+                autoCapitalize={autoCapitalize}
+                autoCorrect={autoCorrect}
+                aria-invalid={fieldState.invalid}
+                className="bg-background"
+                disabled={isSubmitting}
+              />
+              <FieldError errors={[fieldState.error]} />
+            </FieldContent>
+          </Field>
+        );
+      }}
+    />
+  );
 
   return (
-    <form className="grid gap-2" onSubmit={handleSubmit}>
-      {mode === 'signup' ? (
-        <div className="grid gap-1">
-          <Input
-            name="name"
-            placeholder="Your name"
-            type="text"
-            autoComplete="name"
-            className="bg-background"
-            required
-          />
-        </div>
-      ) : null}
-      <div className="grid gap-1">
-        <Input
-          name="email"
-          placeholder="name@example.com"
-          type="email"
-          autoCapitalize="none"
-          autoComplete="email"
-          autoCorrect="off"
-          className="bg-background"
-          required
-        />
-      </div>
-      <div className="grid gap-1">
-        <Input
-          name="password"
-          placeholder="Enter your password"
-          type="password"
-          autoComplete="current-password"
-          className="bg-background"
-          required
-        />
-      </div>
-      <Button disabled={isLoading} type="submit" className="relative">
-        <span className="text-sm">{isLoading ? loadingLabel : buttonLabel}</span>
-        {isLoading ? (
+    <form className="grid gap-3" onSubmit={handleFormSubmit} noValidate>
+      <FieldGroup className="gap-1.5">
+        {mode === 'signup'
+          ? renderInput({
+              name: 'name',
+              label: 'Name',
+              placeholder: 'Your name',
+              autoComplete: 'name',
+            })
+          : null}
+        {renderInput({
+          name: 'email',
+          label: 'Email',
+          placeholder: 'name@example.com',
+          type: 'email',
+          autoCapitalize: 'none',
+          autoComplete: 'email',
+          autoCorrect: 'off',
+        })}
+        {renderInput({
+          name: 'password',
+          label: 'Password',
+          placeholder: 'Enter your password',
+          type: 'password',
+          autoComplete: mode === 'signup' ? 'new-password' : 'current-password',
+        })}
+      </FieldGroup>
+      <Button disabled={isSubmitting} type="submit" className="relative">
+        <span className="text-sm">
+          {isSubmitting ? loadingLabel : buttonLabel}
+        </span>
+        {isSubmitting ? (
           <Spinner />
         ) : (
           mode === 'signin' &&
@@ -171,12 +227,15 @@ export function EmailSignIn() {
         variant="link"
         size="sm"
         className="justify-start px-0 text-muted-foreground"
-        onClick={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
-        disabled={isLoading}
+        onClick={() => {
+          setMode(mode === 'signup' ? 'signin' : 'signup');
+          form.clearErrors();
+        }}
+        disabled={isSubmitting}
       >
         {mode === 'signup'
           ? 'Already have an account? Sign in'
-          : "New here? Create an account"}
+          : 'New here? Create an account'}
       </Button>
     </form>
   );
