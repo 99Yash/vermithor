@@ -31,6 +31,10 @@ export function EmailSignIn() {
   const [mode, setMode] = React.useState<AuthMode>('signin');
 
   const [isLoading, setIsLoading] = React.useState(false);
+  const buttonLabel =
+    mode === 'signup' ? 'Create account' : 'Sign In with Email';
+  const loadingLabel =
+    mode === 'signup' ? 'Creating account...' : 'Signing in...';
 
   const persistLastAuthMethod = () => {
     setLocalStorageItem(LAST_AUTH_METHOD_KEY, 'EMAIL');
@@ -150,15 +154,16 @@ export function EmailSignIn() {
         />
       </div>
       <Button disabled={isLoading} type="submit" className="relative">
+        <span className="text-sm">{isLoading ? loadingLabel : buttonLabel}</span>
         {isLoading ? (
-          <Spinner className="mr-2 bg-background" />
+          <Spinner />
         ) : (
-          mode === 'signup' ? 'Create account' : 'Sign In with Email'
-        )}
-        {mode === 'signin' && lastAuthMethod === 'EMAIL' && (
-          <i className="text-xs absolute right-4 text-muted text-center">
-            Last used
-          </i>
+          mode === 'signin' &&
+          lastAuthMethod === 'EMAIL' && (
+            <i className="text-xs absolute right-4 text-muted text-center">
+              Last used
+            </i>
+          )
         )}
       </Button>
       <Button

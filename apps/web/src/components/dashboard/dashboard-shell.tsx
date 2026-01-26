@@ -3,12 +3,18 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   Bell,
+  ChevronDown,
+  CreditCard,
+  FileText,
   FolderPlus,
   Gauge,
   Home,
   Library,
+  LifeBuoy,
   LogOut,
+  Settings,
   Sparkles,
+  User,
 } from 'lucide-react';
 import type { Route } from 'next';
 import Link from 'next/link';
@@ -20,7 +26,18 @@ import {
   DashboardPanelContent,
 } from '~/components/dashboard/dashboard-panel';
 import { DashboardSidebarToggle } from '~/components/dashboard/sidebar-toggle';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
 import {
   Sheet,
   SheetContent,
@@ -45,6 +62,18 @@ const navItems: NavItem[] = [
   { id: 'home', label: 'Home', icon: Home, href: route('/dashboard') },
   { id: 'library', label: 'Library', icon: Library, disabled: true },
   { id: 'agent', label: 'Agent', icon: Sparkles, disabled: true },
+];
+
+type UserStat = {
+  id: string;
+  label: string;
+  value: string;
+  icon: LucideIcon;
+};
+
+const userStats: UserStat[] = [
+  { id: 'resumes', label: 'Resumes', value: '0', icon: FileText },
+  { id: 'matches', label: 'Matches', value: '0', icon: Sparkles },
 ];
 
 type DashboardShellProps = {
@@ -124,23 +153,7 @@ function SidebarBrand({
 }) {
   return (
     <div className="flex w-full items-center justify-between gap-3">
-      <div
-        className={cn('flex items-center gap-3', collapsed && 'justify-center')}
-      >
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 bg-card shadow-sm">
-          <img
-            src="/favicon.svg"
-            alt={`${siteConfig.name} mark`}
-            className="h-4 w-4 opacity-80"
-          />
-        </div>
-        <div className={cn(collapsed && 'sr-only')}>
-          <p className="text-sm font-semibold leading-tight">
-            {siteConfig.name}
-          </p>
-          <p className="text-xs text-muted-foreground">Dashboard</p>
-        </div>
-      </div>
+      <SidebarUserMenu collapsed={collapsed} />
       {children}
     </div>
   );
@@ -153,29 +166,6 @@ function SidebarSections({
   collapsed: boolean;
   activeNav: string;
 }) {
-  const router = useRouter();
-  const [isSigningOut, setIsSigningOut] = useState(false);
-
-  const handleSignOut = async () => {
-    if (isSigningOut) {
-      return;
-    }
-
-    setIsSigningOut(true);
-
-    try {
-      const { error } = await authClient.signOut();
-      if (error) {
-        throw error;
-      }
-
-      router.replace('/signin');
-    } catch (error) {
-      toast.error(getErrorMessage(error));
-      setIsSigningOut(false);
-    }
-  };
-
   return (
     <div className="flex h-full flex-col gap-6">
       <nav className="space-y-1">
@@ -202,13 +192,6 @@ function SidebarSections({
       </div>
 
       <div className="mt-auto space-y-4">
-        <SidebarActionButton
-          icon={LogOut}
-          label={isSigningOut ? 'Signing out...' : 'Log out'}
-          collapsed={collapsed}
-          onClick={handleSignOut}
-          disabled={isSigningOut}
-        />
         <div className={cn('space-y-4', collapsed && 'hidden')}>
           <DashboardPanel className="gap-3 py-4">
             <DashboardPanelContent className="space-y-2 px-4 py-0">
@@ -247,6 +230,163 @@ function SidebarSections({
       </div>
     </div>
   );
+}
+
+function SidebarUserMenu({ collapsed }: { collapsed: boolean }) {
+  const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const displayName =
+    user?.name?.trim() || user?.email?.split('@')[0] || 'New member';
+  const emailLabel = user?.email ?? 'Connect your email';
+  const initials = getUserInitials(user?.name ?? user?.email ?? 'Vermithor');
+
+  const handleSignOut = async () => {
+    if (isSigningOut) {
+      return;
+    }
+
+    setIsSigningOut(true);
+
+    try {
+      const { error } = await authClient.signOut();
+      if (error) {
+        throw error;
+      }
+
+      router.replace('/signin');
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+      setIsSigningOut(false);
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className={cn(
+            'group flex w-full items-center gap-3 rounded-xl border border-border/60 bg-card px-3 py-2 text-left shadow-sm transition hover:border-border/80 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
+            collapsed && 'w-10 justify-center p-0'
+          )}
+          aria-label={collapsed ? `${displayName} menu` : undefined}
+          title={collapsed ? displayName : undefined}
+        >
+          <Avatar className="size-9 border border-border/60 bg-muted/40">
+            {user?.image ? (
+              <AvatarImage src={user.image} alt={displayName} />
+            ) : null}
+            <AvatarFallback className="text-xs font-semibold text-muted-foreground">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className={cn('min-w-0', collapsed && 'sr-only')}>
+            <p className="truncate text-sm font-semibold leading-tight text-foreground">
+              {displayName}
+            </p>
+            <p className="truncate text-xs text-muted-foreground">Dashboard</p>
+          </div>
+          <ChevronDown
+            className={cn(
+              'ml-auto size-4 text-muted-foreground transition group-data-[state=open]:rotate-180',
+              collapsed && 'hidden'
+            )}
+          />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-64">
+        <DropdownMenuLabel className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Avatar className="size-9 border border-border/60 bg-muted/40">
+              {user?.image ? (
+                <AvatarImage src={user.image} alt={displayName} />
+              ) : null}
+              <AvatarFallback className="text-xs font-semibold text-muted-foreground">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div className="min-w-0 space-y-1">
+              <div className="flex items-center gap-2">
+                <p className="truncate text-sm font-semibold text-foreground">
+                  {displayName}
+                </p>
+                <Badge
+                  variant="outline"
+                  className="border-border/60 text-[10px] uppercase tracking-wide text-muted-foreground"
+                >
+                  Starter
+                </Badge>
+              </div>
+              <p className="truncate text-xs text-muted-foreground">
+                {emailLabel}
+              </p>
+            </div>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <div className="grid grid-cols-2 gap-2 px-2 pb-2">
+          {userStats.map((stat) => (
+            <div
+              key={stat.id}
+              className="flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-2 py-2"
+            >
+              <stat.icon className="size-3.5 text-primary" />
+              <div>
+                <p className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                  {stat.label}
+                </p>
+                <p className="text-xs font-semibold text-foreground">
+                  {stat.value}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem disabled>
+            <User className="size-4" />
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled>
+            <Settings className="size-4" />
+            Settings
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled>
+            <CreditCard className="size-4" />
+            Billing
+          </DropdownMenuItem>
+          <DropdownMenuItem disabled>
+            <LifeBuoy className="size-4" />
+            Support
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          variant="destructive"
+          disabled={isSigningOut}
+          onSelect={() => void handleSignOut()}
+        >
+          <LogOut className="size-4" />
+          {isSigningOut ? 'Signing out...' : 'Log out'}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function getUserInitials(value: string) {
+  const sanitized = value.split('@')[0].trim();
+  if (!sanitized) {
+    return 'VM';
+  }
+
+  const parts = sanitized.split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? '';
+  const last = parts.length > 1 ? parts[parts.length - 1]?.[0] ?? '' : '';
+  return `${first}${last}`.toUpperCase() || 'VM';
 }
 
 type SidebarActionButtonProps = {
