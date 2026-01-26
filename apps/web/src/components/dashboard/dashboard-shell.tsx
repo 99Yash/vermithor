@@ -98,12 +98,7 @@ export function DashboardShell({
             collapsed ? 'w-16 items-center' : 'w-60',
           )}
         >
-          <SidebarBrand collapsed={collapsed}>
-            <DashboardSidebarToggle
-              collapsed={collapsed}
-              onToggle={() => setCollapsed((prev) => !prev)}
-            />
-          </SidebarBrand>
+          <SidebarBrand collapsed={collapsed} />
 
           <SidebarSections collapsed={collapsed} activeNav={activeNav} />
         </aside>
@@ -115,13 +110,23 @@ export function DashboardShell({
             scrollClassName="pb-6 pt-4 lg:py-6"
           >
             <div className="px-4 lg:px-6">
-              <div className="mb-4 flex items-center gap-3 lg:hidden">
-                <DashboardSidebarToggle
-                  collapsed={false}
-                  onToggle={() => setMobileOpen(true)}
-                  label="Open sidebar"
-                />
-                <div>
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="lg:hidden">
+                    <DashboardSidebarToggle
+                      collapsed={false}
+                      onToggle={() => setMobileOpen(true)}
+                      label="Open sidebar"
+                    />
+                  </div>
+                  <div className="hidden lg:flex">
+                    <DashboardSidebarToggle
+                      collapsed={collapsed}
+                      onToggle={() => setCollapsed((prev) => !prev)}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-0.5">
                   <p className="text-sm font-semibold leading-tight">
                     {siteConfig.name}
                   </p>
