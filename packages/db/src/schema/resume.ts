@@ -2,6 +2,8 @@ import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { lifecycle_dates } from '../helpers';
 import { user } from './auth';
 
+export type ResumeFileStatus = 'pending' | 'uploaded' | 'rejected';
+
 export const resumeFile = pgTable('resume_file', {
   id: text('id').primaryKey(),
   userId: text('user_id')
@@ -12,6 +14,6 @@ export const resumeFile = pgTable('resume_file', {
   originalFileName: text('original_file_name').notNull(),
   contentType: text('content_type').notNull(),
   sizeBytes: integer('size_bytes').notNull(),
-  status: text('status').notNull(),
+  status: text('status').notNull().$type<ResumeFileStatus>(),
   ...lifecycle_dates,
 });

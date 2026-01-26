@@ -28,6 +28,7 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
   const [isLoading, setIsLoading] = React.useState(false);
 
   const provider = getProviderById(providerId);
+  const authMethod = providerId.toUpperCase() as AuthOptionsType;
 
   const handleOAuthSignIn = React.useCallback(async () => {
     if (!provider) {
@@ -41,15 +42,11 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
         typeof window === 'undefined'
           ? '/dashboard'
           : `${window.location.origin}/dashboard`;
+      setLocalStorageItem(LAST_AUTH_METHOD_KEY, authMethod);
       await authClient.signIn.social({
         provider: providerId,
         callbackURL,
       });
-
-      setLocalStorageItem(
-        LAST_AUTH_METHOD_KEY,
-        providerId.toUpperCase() as AuthOptionsType,
-      );
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
@@ -77,7 +74,7 @@ const OAuthButton: React.FC<OAuthButtonProps> = ({ providerId, className }) => {
       {isLoading ? (
         <Spinner className="mr-2 bg-background" />
       ) : (
-        lastAuthMethod === (provider.id.toUpperCase() as AuthOptionsType) && (
+        lastAuthMethod === authMethod && (
           <i className="text-xs absolute right-4 text-muted-foreground text-center">
             Last used
           </i>

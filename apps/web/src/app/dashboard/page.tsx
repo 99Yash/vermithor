@@ -239,7 +239,7 @@ function DashboardHome() {
               <Input
                 placeholder="Ask the agent to summarize strengths, or rewrite bullets."
                 aria-label="Ask the agent"
-                className="h-8 flex-1 border-0 px-0 text-sm text-foreground placeholder:text-muted-foreground/80 shadow-none focus-visible:ring-0 bg-transparent! dark:bg-transparent!"
+                className="h-8 flex-1 border-0 px-0 text-sm text-foreground placeholder:text-muted-foreground/80 shadow-none focus-visible:ring-0 bg-transparent!"
               />
               <Button
                 size="icon-sm"
