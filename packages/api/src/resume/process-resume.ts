@@ -15,6 +15,31 @@ export type ResumeParseJob = {
   userId: string;
 };
 
+const RESUME_FILE_READ_TIMEOUT_MS = 15_000;
+const RESUME_PARSE_TIMEOUT_MS = 30_000;
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  message: string,
+): Promise<T> {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(message));
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([promise, timeoutPromise]);
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+  }
+}
+
+
 export async function processResumeParseJob({
   resumeId,
   userId,
@@ -63,11 +88,19 @@ export async function processResumeParseJob({
   }
 
   try {
-    const pdfBuffer = await readResumeFile({ key: record.s3Key });
+    const pdfBuffer = await withTimeout(
+      readResumeFile({ key: record.s3Key }),
+      RESUME_FILE_READ_TIMEOUT_MS,
+      'Timed out reading resume from storage.',
+    );
     const parser = new PDFParse({ data: pdfBuffer });
 
     try {
-      const textResult = await parser.getText();
+      const textResult = await withTimeout(
+        parser.getText(),
+        RESUME_PARSE_TIMEOUT_MS,
+        'Timed out parsing resume.',
+      );
       const rawText = textResult.text;
       const pageCount = textResult.total;
 

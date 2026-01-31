@@ -1,10 +1,10 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 import {
   Controller,
+  type FieldErrors,
   type FieldPath,
   type Resolver,
   useForm,
@@ -46,14 +46,36 @@ export function EmailSignIn() {
   const lastAuthMethod = useLastAuthMethod();
   const [mode, setMode] = React.useState<AuthMode>('signin');
 
-  const authSchema = React.useMemo(
+  const authSchema = React.useMemo<z.ZodType<AuthFormValues, AuthFormValues>>(
     () => (mode === 'signup' ? signUpSchema : signInSchema),
     [mode],
   );
+  const resolver = React.useCallback<Resolver<AuthFormValues>>(
+    async (values) => {
+      const result = authSchema.safeParse(values);
+      if (result.success) {
+        return { values: result.data, errors: {} };
+      }
+
+      const fieldErrors = result.error.flatten().fieldErrors;
+      const errors: FieldErrors<AuthFormValues> = {};
+
+      if (fieldErrors.name?.[0]) {
+        errors.name = { type: 'validation', message: fieldErrors.name[0] };
+      }
+      if (fieldErrors.email?.[0]) {
+        errors.email = { type: 'validation', message: fieldErrors.email[0] };
+      }
+      if (fieldErrors.password?.[0]) {
+        errors.password = { type: 'validation', message: fieldErrors.password[0] };
+      }
+
+      return { values: {}, errors };
+    },
+    [authSchema],
+  );
   const form = useForm<AuthFormValues>({
-    resolver: zodResolver(
-      authSchema as unknown as Parameters<typeof zodResolver>[0],
-    ) as unknown as Resolver<AuthFormValues>,
+    resolver,
     defaultValues: {
       name: '',
       email: '',

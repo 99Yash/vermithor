@@ -146,12 +146,20 @@ export function ResumeListClient({ className }: ResumeListClientProps) {
   });
 
   const handleDownload = async (resumeId: string) => {
+    const popup = window.open('', '_blank', 'noopener,noreferrer');
+
     try {
       const result = await queryClient.fetchQuery(
         trpc.resumes.getDownloadUrl.queryOptions({ resumeId }),
       );
-      window.open(result.url, '_blank', 'noopener,noreferrer');
+
+      if (popup) {
+        popup.location.href = result.url;
+      } else {
+        window.open(result.url, '_blank', 'noopener,noreferrer');
+      }
     } catch (err) {
+      popup?.close();
       toast.error(getErrorMessage(err));
     }
   };

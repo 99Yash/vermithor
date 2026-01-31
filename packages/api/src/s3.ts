@@ -24,7 +24,7 @@ function hasArrayBuffer(body: unknown): body is ArrayBufferSource {
 
 async function streamToBuffer(body: unknown): Promise<Buffer> {
   if (!body) {
-    return Buffer.alloc(0);
+    throw new Error('S3 response body was empty.');
   }
 
   if (body instanceof Readable) {
@@ -40,7 +40,7 @@ async function streamToBuffer(body: unknown): Promise<Buffer> {
     return Buffer.from(buffer);
   }
 
-  return Buffer.alloc(0);
+  throw new Error('Unsupported S3 response body type.');
 }
 
 const s3Client = new S3Client({ region: getS3Env().AWS_REGION });

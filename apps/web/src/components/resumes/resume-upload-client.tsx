@@ -30,6 +30,8 @@ const STATUS_COPY: Record<UploadStatus, { text: string; tone: string }> = {
   error: { text: 'Upload failed.', tone: 'text-destructive' },
 };
 
+const RESUME_UPLOAD_ERROR_ID = 'resume-upload-error';
+
 type ResumeUploadClientProps = {
   className?: string;
 };
@@ -56,6 +58,9 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
   const isBusy =
     status === 'uploading' || status === 'confirming' || status === 'parsing';
   const isInvalid = Boolean(error);
+  const errorMessageClassName = file
+    ? 'text-xs text-destructive'
+    : 'text-sm text-destructive';
 
   const { text: statusText, tone: statusTone } = STATUS_COPY[status];
 
@@ -195,9 +200,6 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
       setStatus('parsing');
       await parseResume.mutateAsync({ resumeId: upload.resumeId });
       setStatus('success');
-      void queryClient.invalidateQueries({
-        queryKey: listQueryOptions.queryKey,
-      });
     } catch (uploadError: unknown) {
       setError(getErrorMessage(uploadError));
       setStatus('error');
@@ -211,6 +213,8 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
         tabIndex={isBusy ? -1 : 0}
         aria-disabled={isBusy}
         aria-invalid={isInvalid}
+        aria-describedby={error ? RESUME_UPLOAD_ERROR_ID : undefined}
+        aria-errormessage={error ? RESUME_UPLOAD_ERROR_ID : undefined}
         onClick={openFileDialog}
         onKeyDown={handleDropzoneKeyDown}
         onDragEnter={handleDragEnter}
@@ -270,7 +274,6 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
                 {formatBytes(file.size)}
               </p>
               <p className={cn('text-xs', statusTone)}>{statusText}</p>
-              {error ? <p className="text-xs text-destructive">{error}</p> : null}
             </div>
             <Button
               type="button"
@@ -287,7 +290,15 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
         </div>
       ) : null}
 
-      {!file && error ? <p className="text-sm text-destructive">{error}</p> : null}
+      {error ? (
+        <p
+          id={RESUME_UPLOAD_ERROR_ID}
+          role="alert"
+          className={errorMessageClassName}
+        >
+          {error}
+        </p>
+      ) : null}
 
       <Button onClick={handleUpload} disabled={!file || isBusy}>
         {status === 'parsing'

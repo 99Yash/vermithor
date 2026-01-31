@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { getS3Env } from '../env';
 import { protectedProcedure, router } from '../index';
 import { enqueueResumeParse } from '../queues/resume-parse';
+import { assertRateLimit } from '../rate-limit';
 import {
   buildResumeKey,
   createResumeUploadPost,
@@ -18,6 +19,14 @@ import {
 
 const PDF_CONTENT_TYPE = 'application/pdf';
 const PDF_MAGIC_HEADER = '%PDF-';
+const RESUME_LIST_DEFAULT_LIMIT = 50;
+const RESUME_LIST_MAX_LIMIT = 100;
+const RESUME_UPLOAD_RATE_LIMIT = { limit: 10, windowSeconds: 60 };
+const RESUME_CONFIRM_RATE_LIMIT = { limit: 10, windowSeconds: 60 };
+const RESUME_PARSE_RATE_LIMIT = { limit: 5, windowSeconds: 60 };
+
+const resumeRateLimitKey = (action: string, userId: string) =>
+  `resume:${action}:${userId}`;
 
 function assertPdfHeader(buffer: Buffer) {
   return buffer.toString('utf8').startsWith(PDF_MAGIC_HEADER);
@@ -50,6 +59,11 @@ export const resumesRouter = router({
       }
 
       const userId = ctx.session.user.id;
+      await assertRateLimit({
+        key: resumeRateLimitKey('create', userId),
+        limit: RESUME_UPLOAD_RATE_LIMIT.limit,
+        windowSeconds: RESUME_UPLOAD_RATE_LIMIT.windowSeconds,
+      });
       const resumeId = createId('resume');
       const s3Key = buildResumeKey({ userId, resumeId });
 
@@ -82,6 +96,11 @@ export const resumesRouter = router({
     .input(z.object({ resumeId: z.string().min(1) }))
     .mutation(async ({ input, ctx }) => {
       const userId = ctx.session.user.id;
+      await assertRateLimit({
+        key: resumeRateLimitKey('confirm', userId),
+        limit: RESUME_CONFIRM_RATE_LIMIT.limit,
+        windowSeconds: RESUME_CONFIRM_RATE_LIMIT.windowSeconds,
+      });
       const env = getS3Env();
       const [record] = await db
         .select()
@@ -114,7 +133,16 @@ export const resumesRouter = router({
         });
       };
 
-      const head = await headResumeObject({ key: record.s3Key });
+      let head;
+      try {
+        head = await headResumeObject({ key: record.s3Key });
+      } catch (error) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to read uploaded file metadata.',
+          cause: error,
+        });
+      }
       const contentLength = head.ContentLength ?? 0;
       const contentType = head.ContentType ?? '';
 
@@ -126,7 +154,16 @@ export const resumesRouter = router({
         await rejectUpload('Uploaded file failed size validation.');
       }
 
-      const header = await readResumeHeader({ key: record.s3Key });
+      let header;
+      try {
+        header = await readResumeHeader({ key: record.s3Key });
+      } catch (error) {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to validate uploaded file content.',
+          cause: error,
+        });
+      }
       if (!assertPdfHeader(header)) {
         await rejectUpload('Uploaded file failed PDF validation.');
       }
@@ -143,8 +180,17 @@ export const resumesRouter = router({
       return { resumeId: record.id, status: 'uploaded' };
     }),
 
-  list: protectedProcedure.query(async ({ ctx }) => {
+  list: protectedProcedure
+    .input(
+      z
+        .object({
+          limit: z.number().int().min(1).max(RESUME_LIST_MAX_LIMIT).optional(),
+        })
+        .optional(),
+    )
+    .query(async ({ ctx, input }) => {
     const userId = ctx.session.user.id;
+    const limit = input?.limit ?? RESUME_LIST_DEFAULT_LIMIT;
     const items = await db
       .select({
         id: resumeFile.id,
@@ -160,7 +206,8 @@ export const resumesRouter = router({
       .from(resumeFile)
       .leftJoin(resumeParsed, eq(resumeFile.id, resumeParsed.resumeFileId))
       .where(eq(resumeFile.userId, userId))
-      .orderBy(desc(resumeFile.createdAt));
+      .orderBy(desc(resumeFile.createdAt))
+      .limit(limit);
 
     return items;
   }),
@@ -220,6 +267,11 @@ export const resumesRouter = router({
     .input(z.object({ resumeId: z.string().min(1) }))
     .mutation(async ({ input, ctx }) => {
       const userId = ctx.session.user.id;
+      await assertRateLimit({
+        key: resumeRateLimitKey('parse', userId),
+        limit: RESUME_PARSE_RATE_LIMIT.limit,
+        windowSeconds: RESUME_PARSE_RATE_LIMIT.windowSeconds,
+      });
 
       const [record] = await db
         .select()

@@ -1,6 +1,6 @@
 {
-  "id": "7295364a-bc6f-40fa-afe0-9dcc54d92588",
-  "prevId": "bef04543-96a0-4800-95fc-0862679960cb",
+  "id": "0f0209e6-0d7a-46de-9f81-d52658b805c4",
+  "prevId": "98185409-3acd-4a02-8b24-25a772c92cca",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -89,29 +89,7 @@
           "default": "current_timestamp"
         }
       },
-      "indexes": {
-        "resume_file_user_id_created_at_idx": {
-          "name": "resume_file_user_id_created_at_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": false,
-              "nulls": "last"
-            },
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": false,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "account_user_id_user_id_fk": {
           "name": "account_user_id_user_id_fk",
@@ -188,23 +166,7 @@
           "default": "current_timestamp"
         }
       },
-      "indexes": {
-        "resume_parsed_user_id_idx": {
-          "name": "resume_parsed_user_id_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": false,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "session_user_id_user_id_fk": {
           "name": "session_user_id_user_id_fk",
@@ -346,15 +308,7 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "resume_parsed_resume_file_id_unique": {
-          "name": "resume_parsed_resume_file_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "resume_file_id"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -426,7 +380,29 @@
           "default": "current_timestamp"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "resume_file_user_id_created_at_idx": {
+          "name": "resume_file_user_id_created_at_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "resume_file_user_id_user_id_fk": {
           "name": "resume_file_user_id_user_id_fk",
@@ -476,6 +452,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "data": {
+          "name": "data",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
         "page_count": {
           "name": "page_count",
           "type": "integer",
@@ -509,7 +491,23 @@
           "default": "current_timestamp"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "resume_parsed_user_id_idx": {
+          "name": "resume_parsed_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "resume_parsed_resume_file_id_resume_file_id_fk": {
           "name": "resume_parsed_resume_file_id_resume_file_id_fk",
@@ -539,7 +537,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "resume_parsed_resume_file_id_unique": {
+          "name": "resume_parsed_resume_file_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "resume_file_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
