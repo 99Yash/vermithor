@@ -108,8 +108,9 @@ function getParseStatus(
     case 'failed':
       return { value: 'Failed', tone: 'danger', icon: AlertCircle };
     case null:
-    case 'pending':
       return { value: 'Ready', tone: 'neutral', icon: Clock };
+    case 'pending':
+      return { value: 'Queued', tone: 'neutral', icon: Clock };
   }
 
   return assertNever(parsedStatus);
@@ -269,7 +270,8 @@ export function ResumeListClient({ className }: ResumeListClientProps) {
               <div className="flex shrink-0 flex-wrap items-center gap-2">
                 {resume.status === 'uploaded' &&
                   resume.parsedStatus !== 'completed' &&
-                  resume.parsedStatus !== 'parsing' && (
+                  resume.parsedStatus !== 'parsing' &&
+                  resume.parsedStatus !== 'pending' && (
                     <Button
                       variant="outline"
                       size="sm"

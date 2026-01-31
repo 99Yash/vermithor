@@ -1,4 +1,5 @@
 import { createContext } from '@vermithor/api/context';
+import { createResumeParseWorker } from '@vermithor/api/queues/resume-parse';
 import { appRouter } from '@vermithor/api/routers/index';
 import { auth } from '@vermithor/auth';
 import { cors } from '@elysiajs/cors';
@@ -9,6 +10,10 @@ import { Elysia } from 'elysia';
 import { getServerEnv } from './env';
 
 const env = getServerEnv();
+const resumeParseWorker = createResumeParseWorker();
+const closeResumeWorker = async () => {
+  await resumeParseWorker.close();
+};
 const corsOrigins = new Set<string>([
   ...env.CORS_ORIGIN,
   ...env.FRONTEND_URL,
@@ -53,3 +58,6 @@ new Elysia({ adapter: node() })
   .listen(3001, () => {
     console.log('Server is running on http://localhost:3001');
   });
+
+process.on('SIGINT', closeResumeWorker);
+process.on('SIGTERM', closeResumeWorker);

@@ -1,19 +1,18 @@
 import { TRPCError } from '@trpc/server';
 import { and, desc, eq } from 'drizzle-orm';
-import { PDFParse } from 'pdf-parse';
 import { db } from '@vermithor/db';
 import { createId } from '@vermithor/db/helpers';
-import { resumeFile, resumeParsed, type ResumeParsedStatus } from '@vermithor/db/schema/resume';
+import { resumeFile, resumeParsed } from '@vermithor/db/schema/resume';
 import { z } from 'zod';
 import { getS3Env } from '../env';
 import { protectedProcedure, router } from '../index';
+import { enqueueResumeParse } from '../queues/resume-parse';
 import {
   buildResumeKey,
   createResumeUploadPost,
   deleteResumeObject,
   getResumeDownloadUrl,
   headResumeObject,
-  readResumeFile,
   readResumeHeader,
 } from '../s3';
 
@@ -250,12 +249,23 @@ export const resumesRouter = router({
         .where(eq(resumeParsed.resumeFileId, input.resumeId))
         .limit(1);
 
-      if (existingParsed?.status === 'completed') {
+      if (existingParsed?.status === 'completed' && existingParsed.data) {
         return {
           parsedId: existingParsed.id,
           status: existingParsed.status,
           rawText: existingParsed.rawText,
           pageCount: existingParsed.pageCount,
+          data: existingParsed.data,
+        };
+      }
+
+      if (
+        existingParsed?.status === 'pending' ||
+        existingParsed?.status === 'parsing'
+      ) {
+        return {
+          parsedId: existingParsed.id,
+          status: existingParsed.status,
         };
       }
 
@@ -264,46 +274,22 @@ export const resumesRouter = router({
       if (existingParsed) {
         await db
           .update(resumeParsed)
-          .set({ status: 'parsing', errorMessage: null })
+          .set({ status: 'pending', errorMessage: null })
           .where(eq(resumeParsed.id, parsedId));
       } else {
         await db.insert(resumeParsed).values({
           id: parsedId,
           resumeFileId: input.resumeId,
           userId,
-          status: 'parsing',
+          status: 'pending',
         });
       }
 
       try {
-        const pdfBuffer = await readResumeFile({ key: record.s3Key });
-        const parser = new PDFParse({ data: pdfBuffer });
-
-        try {
-          const textResult = await parser.getText();
-          const completedStatus: ResumeParsedStatus = 'completed';
-
-          await db
-            .update(resumeParsed)
-            .set({
-              status: completedStatus,
-              rawText: textResult.text,
-              pageCount: textResult.total,
-            })
-            .where(eq(resumeParsed.id, parsedId));
-
-          return {
-            parsedId,
-            status: completedStatus,
-            rawText: textResult.text,
-            pageCount: textResult.total,
-          };
-        } finally {
-          await parser.destroy().catch(() => undefined);
-        }
+        await enqueueResumeParse({ resumeId: input.resumeId, userId });
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Unknown parsing error';
+          error instanceof Error ? error.message : 'Failed to queue resume parse.';
 
         await db
           .update(resumeParsed)
@@ -312,10 +298,15 @@ export const resumesRouter = router({
 
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to parse resume PDF.',
+          message: 'Failed to queue resume parsing.',
           cause: error,
         });
       }
+
+      return {
+        parsedId,
+        status: 'pending',
+      };
     }),
 
   getParsedContent: protectedProcedure
@@ -352,6 +343,7 @@ export const resumesRouter = router({
         status: parsed.status,
         rawText: parsed.rawText,
         pageCount: parsed.pageCount,
+        data: parsed.data,
         errorMessage: parsed.errorMessage,
       };
     }),

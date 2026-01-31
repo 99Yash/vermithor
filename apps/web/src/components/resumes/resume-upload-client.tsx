@@ -25,8 +25,8 @@ const STATUS_COPY: Record<UploadStatus, { text: string; tone: string }> = {
     tone: 'text-muted-foreground',
   },
   confirming: { text: 'Verifying upload...', tone: 'text-muted-foreground' },
-  parsing: { text: 'Parsing resume...', tone: 'text-muted-foreground' },
-  success: { text: 'Resume uploaded and parsed.', tone: 'text-emerald-600' },
+  parsing: { text: 'Queueing parse...', tone: 'text-muted-foreground' },
+  success: { text: 'Resume queued for parsing.', tone: 'text-emerald-600' },
   error: { text: 'Upload failed.', tone: 'text-destructive' },
 };
 
@@ -46,7 +46,12 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
   const confirmUpload = useMutation(
     trpc.resumes.confirmUpload.mutationOptions(),
   );
-  const parseResume = useMutation(trpc.resumes.parse.mutationOptions());
+  const parseResume = useMutation({
+    ...trpc.resumes.parse.mutationOptions(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: listQueryOptions.queryKey });
+    },
+  });
 
   const isBusy =
     status === 'uploading' || status === 'confirming' || status === 'parsing';
@@ -286,7 +291,7 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
 
       <Button onClick={handleUpload} disabled={!file || isBusy}>
         {status === 'parsing'
-          ? 'Parsing...'
+          ? 'Queueing...'
           : status === 'confirming'
             ? 'Confirming...'
             : status === 'uploading'

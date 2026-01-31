@@ -10,7 +10,7 @@ import {
   useForm,
 } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod/v4';
+import { z } from 'zod';
 import { Button } from '~/components/ui/button';
 import {
   Field,
@@ -51,7 +51,9 @@ export function EmailSignIn() {
     [mode],
   );
   const form = useForm<AuthFormValues>({
-    resolver: zodResolver(authSchema) as Resolver<AuthFormValues>,
+    resolver: zodResolver(
+      authSchema as unknown as Parameters<typeof zodResolver>[0],
+    ) as unknown as Resolver<AuthFormValues>,
     defaultValues: {
       name: '',
       email: '',

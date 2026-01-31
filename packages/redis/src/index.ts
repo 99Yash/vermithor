@@ -24,3 +24,5 @@ export async function getRedisClient(): Promise<RedisClient> {
   sharedClient = client;
   return client;
 }
+
+export { getRedisEnv };
