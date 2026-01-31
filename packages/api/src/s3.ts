@@ -9,6 +9,40 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Readable } from 'node:stream';
 import { getS3Env } from './env';
 
+type ArrayBufferSource = {
+  arrayBuffer: () => Promise<ArrayBuffer>;
+};
+
+function hasArrayBuffer(body: unknown): body is ArrayBufferSource {
+  return (
+    typeof body === 'object' &&
+    body !== null &&
+    'arrayBuffer' in body &&
+    typeof (body as { arrayBuffer?: unknown }).arrayBuffer === 'function'
+  );
+}
+
+async function streamToBuffer(body: unknown): Promise<Buffer> {
+  if (!body) {
+    return Buffer.alloc(0);
+  }
+
+  if (body instanceof Readable) {
+    const chunks: Buffer[] = [];
+    for await (const chunk of body) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+    return Buffer.concat(chunks);
+  }
+
+  if (hasArrayBuffer(body)) {
+    const buffer = await body.arrayBuffer();
+    return Buffer.from(buffer);
+  }
+
+  return Buffer.alloc(0);
+}
+
 const s3Client = new S3Client({ region: getS3Env().AWS_REGION });
 
 type PresignedPostConditions = NonNullable<
@@ -105,24 +139,7 @@ export async function readResumeHeader({ key }: { key: string }) {
     })
   );
 
-  if (!response.Body) {
-    return Buffer.alloc(0);
-  }
-
-  if (response.Body instanceof Readable) {
-    const chunks: Buffer[] = [];
-    for await (const chunk of response.Body) {
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    }
-    return Buffer.concat(chunks);
-  }
-
-  if (typeof (response.Body as Blob).arrayBuffer === 'function') {
-    const buffer = await (response.Body as Blob).arrayBuffer();
-    return Buffer.from(buffer);
-  }
-
-  return Buffer.alloc(0);
+  return streamToBuffer(response.Body);
 }
 
 export async function readResumeFile({ key }: { key: string }): Promise<Buffer> {
@@ -134,22 +151,5 @@ export async function readResumeFile({ key }: { key: string }): Promise<Buffer> 
     })
   );
 
-  if (!response.Body) {
-    return Buffer.alloc(0);
-  }
-
-  if (response.Body instanceof Readable) {
-    const chunks: Buffer[] = [];
-    for await (const chunk of response.Body) {
-      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-    }
-    return Buffer.concat(chunks);
-  }
-
-  if (typeof (response.Body as Blob).arrayBuffer === 'function') {
-    const buffer = await (response.Body as Blob).arrayBuffer();
-    return Buffer.from(buffer);
-  }
-
-  return Buffer.alloc(0);
+  return streamToBuffer(response.Body);
 }

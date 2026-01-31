@@ -1,14 +1,21 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { FileText, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { formatBytes } from '~/lib/format';
 import { trpc } from '~/lib/trpc';
-import { cn } from '~/lib/utils';
+import { cn, getErrorMessage } from '~/lib/utils';
 
-type UploadStatus = 'idle' | 'uploading' | 'confirming' | 'success' | 'error';
+type UploadStatus =
+  | 'idle'
+  | 'uploading'
+  | 'confirming'
+  | 'parsing'
+  | 'success'
+  | 'error';
 
 const PDF_CONTENT_TYPE = 'application/pdf';
 const STATUS_COPY: Record<UploadStatus, { text: string; tone: string }> = {
@@ -18,33 +25,18 @@ const STATUS_COPY: Record<UploadStatus, { text: string; tone: string }> = {
     tone: 'text-muted-foreground',
   },
   confirming: { text: 'Verifying upload...', tone: 'text-muted-foreground' },
-  success: { text: 'Upload verified.', tone: 'text-emerald-600' },
+  parsing: { text: 'Parsing resume...', tone: 'text-muted-foreground' },
+  success: { text: 'Resume uploaded and parsed.', tone: 'text-emerald-600' },
   error: { text: 'Upload failed.', tone: 'text-destructive' },
 };
-
-function formatBytes(bytes: number) {
-  if (!Number.isFinite(bytes)) {
-    return '0 B';
-  }
-
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let size = bytes;
-  let unitIndex = 0;
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex += 1;
-  }
-
-  const precision = unitIndex === 0 ? 0 : 1;
-  return `${size.toFixed(precision)} ${units[unitIndex]}`;
-}
 
 type ResumeUploadClientProps = {
   className?: string;
 };
 
 export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
+  const queryClient = useQueryClient();
+  const listQueryOptions = trpc.resumes.list.queryOptions();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<UploadStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -54,8 +46,10 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
   const confirmUpload = useMutation(
     trpc.resumes.confirmUpload.mutationOptions(),
   );
+  const parseResume = useMutation(trpc.resumes.parse.mutationOptions());
 
-  const isBusy = status === 'uploading' || status === 'confirming';
+  const isBusy =
+    status === 'uploading' || status === 'confirming' || status === 'parsing';
   const isInvalid = Boolean(error);
 
   const { text: statusText, tone: statusTone } = STATUS_COPY[status];
@@ -192,11 +186,15 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
 
       setStatus('confirming');
       await confirmUpload.mutateAsync({ resumeId: upload.resumeId });
+
+      setStatus('parsing');
+      await parseResume.mutateAsync({ resumeId: upload.resumeId });
       setStatus('success');
-    } catch (uploadError) {
-      const message =
-        uploadError instanceof Error ? uploadError.message : 'Upload failed.';
-      setError(message);
+      void queryClient.invalidateQueries({
+        queryKey: listQueryOptions.queryKey,
+      });
+    } catch (uploadError: unknown) {
+      setError(getErrorMessage(uploadError));
       setStatus('error');
     }
   };
@@ -216,7 +214,7 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
         onDrop={handleDrop}
         className={cn(
           'relative flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-6 text-center outline-none transition-colors',
-          'hover:bg-accent/30 focus-visible:border-ring/50 focus-visible:ring-ring/30 focus-visible:ring-[3px]',
+          'hover:bg-accent/30 focus-visible:border-ring/50 focus-visible:ring-2 focus-visible:ring-ring/30',
           isBusy && 'cursor-not-allowed opacity-60',
           isDragging && 'border-primary/40 bg-accent/30',
           isInvalid && 'border-destructive/60 bg-destructive/5',
@@ -287,11 +285,13 @@ export function ResumeUploadClient({ className }: ResumeUploadClientProps) {
       {!file && error ? <p className="text-sm text-destructive">{error}</p> : null}
 
       <Button onClick={handleUpload} disabled={!file || isBusy}>
-        {status === 'confirming'
-          ? 'Confirming...'
-          : isBusy
-            ? 'Uploading...'
-            : 'Upload resume'}
+        {status === 'parsing'
+          ? 'Parsing...'
+          : status === 'confirming'
+            ? 'Confirming...'
+            : status === 'uploading'
+              ? 'Uploading...'
+              : 'Upload resume'}
       </Button>
     </div>
   );

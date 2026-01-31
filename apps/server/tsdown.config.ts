@@ -5,5 +5,5 @@ export default defineConfig({
 	format: "esm",
 	outDir: "./dist",
 	clean: true,
-	noExternal: [/@vermithor\/.*/],
+	noExternal: ["@vermithor/api", "@vermithor/auth", "@vermithor/db", "@vermithor/redis"],
 });

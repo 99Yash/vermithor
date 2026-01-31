@@ -3,7 +3,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { PDFParse } from 'pdf-parse';
 import { db } from '@vermithor/db';
 import { createId } from '@vermithor/db/helpers';
-import { resumeFile, resumeParsed } from '@vermithor/db/schema/resume';
+import { resumeFile, resumeParsed, type ResumeParsedStatus } from '@vermithor/db/schema/resume';
 import { z } from 'zod';
 import { getS3Env } from '../env';
 import { protectedProcedure, router } from '../index';
@@ -278,24 +278,29 @@ export const resumesRouter = router({
       try {
         const pdfBuffer = await readResumeFile({ key: record.s3Key });
         const parser = new PDFParse({ data: pdfBuffer });
-        const textResult = await parser.getText();
-        await parser.destroy();
 
-        await db
-          .update(resumeParsed)
-          .set({
-            status: 'completed',
+        try {
+          const textResult = await parser.getText();
+          const completedStatus: ResumeParsedStatus = 'completed';
+
+          await db
+            .update(resumeParsed)
+            .set({
+              status: completedStatus,
+              rawText: textResult.text,
+              pageCount: textResult.total,
+            })
+            .where(eq(resumeParsed.id, parsedId));
+
+          return {
+            parsedId,
+            status: completedStatus,
             rawText: textResult.text,
             pageCount: textResult.total,
-          })
-          .where(eq(resumeParsed.id, parsedId));
-
-        return {
-          parsedId,
-          status: 'completed' as const,
-          rawText: textResult.text,
-          pageCount: textResult.total,
-        };
+          };
+        } finally {
+          await parser.destroy().catch(() => undefined);
+        }
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown parsing error';

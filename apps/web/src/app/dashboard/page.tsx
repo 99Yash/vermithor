@@ -17,6 +17,7 @@ import {
   DashboardPanel,
   DashboardPanelContent,
 } from '~/components/dashboard/dashboard-panel';
+import { ResumeListClient } from '~/components/resumes/resume-list-client';
 import { ResumeUploadClient } from '~/components/resumes/resume-upload-client';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -279,11 +280,6 @@ function ResumeTab() {
       <SectionHeader
         id="resume-tab-title"
         title="Resume"
-        action={
-          <Badge variant="outline" className="border-border/60 text-xs">
-            No file uploaded
-          </Badge>
-        }
       />
       <DashboardPanel>
         <DashboardPanelContent className="space-y-4">
@@ -297,6 +293,12 @@ function ResumeTab() {
           <ResumeUploadClient />
         </DashboardPanelContent>
       </DashboardPanel>
+
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium text-muted-foreground">Your resumes</h3>
+        <ResumeListClient />
+      </div>
+
       <DashboardPanel>
         <DashboardPanelContent className="space-y-3">
           <p className="text-sm font-medium text-foreground">What we validate</p>

@@ -16,7 +16,6 @@
     "check-types": "tsc -b"
   },
   "devDependencies": {
-    "@types/pdf-parse": "^1.1.5",
     "@vermithor/config": "workspace:*",
     "tsdown": "catalog:"
   },
