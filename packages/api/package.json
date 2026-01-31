@@ -16,6 +16,7 @@
     "check-types": "tsc -b"
   },
   "devDependencies": {
+    "@types/pdf-parse": "^1.1.5",
     "@vermithor/config": "workspace:*",
     "tsdown": "catalog:"
   },
@@ -37,6 +38,7 @@
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "elysia": "catalog:",
+    "pdf-parse": "^2.4.5",
     "resumable-stream": "^2.2.10",
     "zod": "catalog:"
   }

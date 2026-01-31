@@ -1,8 +1,9 @@
 import { TRPCError } from '@trpc/server';
 import { and, desc, eq } from 'drizzle-orm';
+import { PDFParse } from 'pdf-parse';
 import { db } from '@vermithor/db';
 import { createId } from '@vermithor/db/helpers';
-import { resumeFile } from '@vermithor/db/schema/resume';
+import { resumeFile, resumeParsed } from '@vermithor/db/schema/resume';
 import { z } from 'zod';
 import { getS3Env } from '../env';
 import { protectedProcedure, router } from '../index';
@@ -12,6 +13,7 @@ import {
   deleteResumeObject,
   getResumeDownloadUrl,
   headResumeObject,
+  readResumeFile,
   readResumeHeader,
 } from '../s3';
 
@@ -145,20 +147,23 @@ export const resumesRouter = router({
   list: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
     const items = await db
-      .select()
+      .select({
+        id: resumeFile.id,
+        originalFileName: resumeFile.originalFileName,
+        contentType: resumeFile.contentType,
+        sizeBytes: resumeFile.sizeBytes,
+        status: resumeFile.status,
+        createdAt: resumeFile.createdAt,
+        updatedAt: resumeFile.updatedAt,
+        parsedStatus: resumeParsed.status,
+        parsedPageCount: resumeParsed.pageCount,
+      })
       .from(resumeFile)
+      .leftJoin(resumeParsed, eq(resumeFile.id, resumeParsed.resumeFileId))
       .where(eq(resumeFile.userId, userId))
       .orderBy(desc(resumeFile.createdAt));
 
-    return items.map((item) => ({
-      id: item.id,
-      originalFileName: item.originalFileName,
-      contentType: item.contentType,
-      sizeBytes: item.sizeBytes,
-      status: item.status,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-    }));
+    return items;
   }),
 
   getDownloadUrl: protectedProcedure
@@ -210,5 +215,139 @@ export const resumesRouter = router({
       await db.delete(resumeFile).where(eq(resumeFile.id, record.id));
 
       return { success: true };
+    }),
+
+  parse: protectedProcedure
+    .input(z.object({ resumeId: z.string().min(1) }))
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.session.user.id;
+
+      const [record] = await db
+        .select()
+        .from(resumeFile)
+        .where(
+          and(eq(resumeFile.id, input.resumeId), eq(resumeFile.userId, userId)),
+        )
+        .limit(1);
+
+      if (!record) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Resume not found.',
+        });
+      }
+
+      if (record.status !== 'uploaded') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Resume must be uploaded before parsing.',
+        });
+      }
+
+      const [existingParsed] = await db
+        .select()
+        .from(resumeParsed)
+        .where(eq(resumeParsed.resumeFileId, input.resumeId))
+        .limit(1);
+
+      if (existingParsed?.status === 'completed') {
+        return {
+          parsedId: existingParsed.id,
+          status: existingParsed.status,
+          rawText: existingParsed.rawText,
+          pageCount: existingParsed.pageCount,
+        };
+      }
+
+      const parsedId = existingParsed?.id ?? createId('parsed');
+
+      if (existingParsed) {
+        await db
+          .update(resumeParsed)
+          .set({ status: 'parsing', errorMessage: null })
+          .where(eq(resumeParsed.id, parsedId));
+      } else {
+        await db.insert(resumeParsed).values({
+          id: parsedId,
+          resumeFileId: input.resumeId,
+          userId,
+          status: 'parsing',
+        });
+      }
+
+      try {
+        const pdfBuffer = await readResumeFile({ key: record.s3Key });
+        const parser = new PDFParse({ data: pdfBuffer });
+        const textResult = await parser.getText();
+        await parser.destroy();
+
+        await db
+          .update(resumeParsed)
+          .set({
+            status: 'completed',
+            rawText: textResult.text,
+            pageCount: textResult.total,
+          })
+          .where(eq(resumeParsed.id, parsedId));
+
+        return {
+          parsedId,
+          status: 'completed' as const,
+          rawText: textResult.text,
+          pageCount: textResult.total,
+        };
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown parsing error';
+
+        await db
+          .update(resumeParsed)
+          .set({ status: 'failed', errorMessage })
+          .where(eq(resumeParsed.id, parsedId));
+
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to parse resume PDF.',
+          cause: error,
+        });
+      }
+    }),
+
+  getParsedContent: protectedProcedure
+    .input(z.object({ resumeId: z.string().min(1) }))
+    .query(async ({ input, ctx }) => {
+      const userId = ctx.session.user.id;
+
+      const [record] = await db
+        .select()
+        .from(resumeFile)
+        .where(
+          and(eq(resumeFile.id, input.resumeId), eq(resumeFile.userId, userId)),
+        )
+        .limit(1);
+
+      if (!record) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Resume not found.',
+        });
+      }
+
+      const [parsed] = await db
+        .select()
+        .from(resumeParsed)
+        .where(eq(resumeParsed.resumeFileId, input.resumeId))
+        .limit(1);
+
+      if (!parsed) {
+        return null;
+      }
+
+      return {
+        status: parsed.status,
+        rawText: parsed.rawText,
+        pageCount: parsed.pageCount,
+        errorMessage: parsed.errorMessage,
+      };
     }),
 });

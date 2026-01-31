@@ -17,3 +17,20 @@ export const resumeFile = pgTable('resume_file', {
   status: text('status').notNull().$type<ResumeFileStatus>(),
   ...lifecycle_dates,
 });
+
+export type ResumeParsedStatus = 'pending' | 'parsing' | 'completed' | 'failed';
+
+export const resumeParsed = pgTable('resume_parsed', {
+  id: text('id').primaryKey(),
+  resumeFileId: text('resume_file_id')
+    .notNull()
+    .references(() => resumeFile.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  rawText: text('raw_text'),
+  pageCount: integer('page_count'),
+  status: text('status').notNull().$type<ResumeParsedStatus>(),
+  errorMessage: text('error_message'),
+  ...lifecycle_dates,
+});

@@ -275,7 +275,7 @@ function DashboardHome() {
 
 function ResumeTab() {
   return (
-    <section aria-labelledby="resume-tab-title" className="space-y-4">
+    <section aria-labelledby="resume-tab-title" className="space-y-8">
       <SectionHeader
         id="resume-tab-title"
         title="Resume"

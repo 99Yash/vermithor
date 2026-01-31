@@ -124,3 +124,32 @@ export async function readResumeHeader({ key }: { key: string }) {
 
   return Buffer.alloc(0);
 }
+
+export async function readResumeFile({ key }: { key: string }): Promise<Buffer> {
+  const env = getS3Env();
+  const response = await s3Client.send(
+    new GetObjectCommand({
+      Bucket: env.AWS_S3_BUCKET_NAME,
+      Key: key,
+    })
+  );
+
+  if (!response.Body) {
+    return Buffer.alloc(0);
+  }
+
+  if (response.Body instanceof Readable) {
+    const chunks: Buffer[] = [];
+    for await (const chunk of response.Body) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+    }
+    return Buffer.concat(chunks);
+  }
+
+  if (typeof (response.Body as Blob).arrayBuffer === 'function') {
+    const buffer = await (response.Body as Blob).arrayBuffer();
+    return Buffer.from(buffer);
+  }
+
+  return Buffer.alloc(0);
+}
