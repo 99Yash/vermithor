@@ -10,9 +10,15 @@ import { Elysia } from 'elysia';
 import { getServerEnv } from './env';
 
 const env = getServerEnv();
-const resumeParseWorker = createResumeParseWorker();
+const resumeParseQueueEnabled =
+  process.env.REDIS_ENABLED === 'true' || process.env.NODE_ENV === 'production';
+const resumeParseWorker = resumeParseQueueEnabled
+  ? createResumeParseWorker()
+  : null;
 const closeResumeWorker = async () => {
-  await resumeParseWorker.close();
+  if (resumeParseWorker) {
+    await resumeParseWorker.close();
+  }
 };
 const corsOrigins = new Set<string>([
   ...env.CORS_ORIGIN,

@@ -9,12 +9,18 @@ type RateLimitConfig = {
 
 const RATE_LIMIT_PREFIX = 'rate-limit';
 const RATE_LIMIT_MESSAGE = 'Too many requests. Please try again later.';
+const REDIS_ENABLED =
+  process.env.REDIS_ENABLED === 'true' || process.env.NODE_ENV === 'production';
 
 export async function assertRateLimit({
   key,
   limit,
   windowSeconds,
 }: RateLimitConfig): Promise<void> {
+  if (!REDIS_ENABLED) {
+    return;
+  }
+
   try {
     const client = await getRedisClient();
     const namespacedKey = `${RATE_LIMIT_PREFIX}:${key}`;

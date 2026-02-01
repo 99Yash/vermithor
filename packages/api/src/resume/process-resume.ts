@@ -124,6 +124,7 @@ export async function processResumeParseJob({
       return {
         parsedId,
         status: completedStatus,
+        rawText,
         data,
         pageCount,
       };

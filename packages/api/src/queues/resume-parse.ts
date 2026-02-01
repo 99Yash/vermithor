@@ -6,8 +6,32 @@ import {
 } from '../resume/process-resume';
 
 const QUEUE_NAME = 'resume-parse';
+const REDIS_ENABLED =
+  process.env.REDIS_ENABLED === 'true' || process.env.NODE_ENV === 'production';
+
+type EnqueueResult =
+  | { queued: true; mode: 'queued' }
+  | { queued: false; mode: 'inline'; reason: 'disabled' | 'unavailable' };
 
 let resumeParseQueue: Queue<ResumeParseJob> | null = null;
+
+function isRedisConnectionError(error: unknown): boolean {
+  if (error instanceof AggregateError) {
+    return error.errors.some((entry) => isRedisConnectionError(entry));
+  }
+
+  if (error && typeof error === 'object' && 'code' in error) {
+    const code = (error as { code?: string }).code;
+    return (
+      code === 'ECONNREFUSED' ||
+      code === 'ENOTFOUND' ||
+      code === 'EAI_AGAIN' ||
+      code === 'ETIMEDOUT'
+    );
+  }
+
+  return false;
+}
 
 const connection = (() => {
   const { REDIS_URI } = getRedisEnv();
@@ -34,26 +58,43 @@ export function getResumeParseQueue() {
         removeOnFail: 50,
       },
     });
+    resumeParseQueue.on('error', () => undefined);
   }
 
   return resumeParseQueue;
 }
 
-export async function enqueueResumeParse(jobData: ResumeParseJob) {
-  const queue = getResumeParseQueue();
-  const existingJob = await queue.getJob(jobData.resumeId);
-
-  if (existingJob) {
-    const state = await existingJob.getState();
-    if (state === 'waiting' || state === 'active' || state === 'delayed') {
-      return existingJob;
-    }
-    await existingJob.remove();
+export async function enqueueResumeParse(
+  jobData: ResumeParseJob,
+): Promise<EnqueueResult> {
+  if (!REDIS_ENABLED) {
+    return { queued: false, mode: 'inline', reason: 'disabled' };
   }
 
-  return queue.add('parse', jobData, {
-    jobId: jobData.resumeId,
-  });
+  const queue = getResumeParseQueue();
+
+  try {
+    const existingJob = await queue.getJob(jobData.resumeId);
+
+    if (existingJob) {
+      const state = await existingJob.getState();
+      if (state === 'waiting' || state === 'active' || state === 'delayed') {
+        return { queued: true, mode: 'queued' };
+      }
+      await existingJob.remove();
+    }
+
+    await queue.add('parse', jobData, {
+      jobId: jobData.resumeId,
+    });
+    return { queued: true, mode: 'queued' };
+  } catch (error) {
+    if (isRedisConnectionError(error)) {
+      return { queued: false, mode: 'inline', reason: 'unavailable' };
+    }
+
+    throw error;
+  }
 }
 
 export type ResumeParseWorkerHandle = {
@@ -72,6 +113,7 @@ export function createResumeParseWorker(): ResumeParseWorkerHandle {
       concurrency: 2,
     },
   );
+  worker.on('error', () => undefined);
 
   return {
     worker,

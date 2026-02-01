@@ -8,6 +8,7 @@ import { getS3Env } from '../env';
 import { protectedProcedure, router } from '../index';
 import { enqueueResumeParse } from '../queues/resume-parse';
 import { assertRateLimit } from '../rate-limit';
+import { processResumeParseJob } from '../resume/process-resume';
 import {
   buildResumeKey,
   createResumeUploadPost,
@@ -338,10 +339,33 @@ export const resumesRouter = router({
       }
 
       try {
-        await enqueueResumeParse({ resumeId: input.resumeId, userId });
+        const enqueueResult = await enqueueResumeParse({
+          resumeId: input.resumeId,
+          userId,
+        });
+
+        if (enqueueResult.queued) {
+          return {
+            parsedId,
+            status: 'pending',
+          };
+        }
+
+        const inlineResult = await processResumeParseJob({
+          resumeId: input.resumeId,
+          userId,
+        });
+
+        return {
+          parsedId: inlineResult.parsedId,
+          status: inlineResult.status,
+          pageCount: inlineResult.pageCount,
+          rawText: inlineResult.rawText,
+          data: inlineResult.data,
+        };
       } catch (error) {
         const errorMessage =
-          error instanceof Error ? error.message : 'Failed to queue resume parse.';
+          error instanceof Error ? error.message : 'Failed to parse resume.';
 
         await db
           .update(resumeParsed)
@@ -350,15 +374,10 @@ export const resumesRouter = router({
 
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to queue resume parsing.',
+          message: 'Failed to parse resume.',
           cause: error,
         });
       }
-
-      return {
-        parsedId,
-        status: 'pending',
-      };
     }),
 
   getParsedContent: protectedProcedure
