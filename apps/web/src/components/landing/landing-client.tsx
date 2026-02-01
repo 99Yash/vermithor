@@ -1,14 +1,11 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { DragonLines } from '~/components/ornaments/dragon-lines';
 import { Button } from '~/components/ui/button';
 import { GitHub, LinkedIn, Mail, X } from '~/components/ui/icons';
-import { authClient } from '~/lib/auth/client';
 import { siteConfig } from '~/lib/site';
-import { trpc } from '~/lib/trpc';
 
 const glowOrbs = [
   'pointer-events-none absolute -left-32 -top-32 h-64 w-64 rounded-full bg-linear-to-br from-stone-400/14 via-stone-300/6 to-transparent blur-3xl dark:from-slate-400/12 dark:via-slate-300/6 dark:to-transparent',
@@ -18,84 +15,24 @@ const glowOrbs = [
   'pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-96 w-96 rounded-full bg-linear-to-b from-amber-300/10 via-amber-200/5 to-transparent blur-3xl dark:from-amber-200/8 dark:via-amber-100/4 dark:to-transparent',
 ];
 
-const featureHighlights = [
+const promiseSteps = [
   {
-    title: 'Focused profile',
-    description: 'Turn your résumé into a clear, searchable profile.',
-  },
-  {
-    title: 'Live matching',
+    number: '01',
+    title: 'Upload your resume',
     description:
-      'Matches arrive as each stage finishes, not in a nightly batch.',
+      'We read between the lines—skills you forgot to mention, experience that translates, potential you undersold.',
   },
   {
-    title: 'Curated control',
-    description: 'Filter, compare, and save roles without losing context.',
-  },
-];
-
-const workflowSteps = [
-  {
-    title: 'Upload',
-    description: 'Start with your résumé.',
-  },
-  {
-    title: 'Focus',
-    description: 'We map experience, preferences, and goals.',
-  },
-  {
-    title: 'Match',
-    description: 'Roles align to your criteria.',
-  },
-  {
-    title: 'Stream',
-    description: 'Matches arrive with context as they are ready.',
-  },
-];
-
-const detailBlocks = [
-  {
-    eyebrow: 'Explore with clarity',
-    title: 'Everything you need to compare roles, in one view.',
+    number: '02',
+    title: 'Match to real roles',
     description:
-      'Filters, notes, and saved views stay pinned as the stream updates.',
-    items: [
-      'Single view for filters and notes.',
-      'Results refresh as you refine.',
-      'Saved views for quick return.',
-    ],
+      'Not job board spam. Positions where your background actually gives you an edge.',
   },
   {
-    eyebrow: 'Refine the résumé',
-    title: 'Make edits with guidance, not guesswork.',
-    description: 'Inline suggestions and checks keep your story tight.',
-    items: [
-      'Inline suggestions as you edit.',
-      'Quick checks before you rerun matches.',
-      'Snapshots to compare and recover.',
-    ],
-  },
-];
-
-const reliabilitySections = [
-  {
-    title: 'Durability by default',
+    number: '03',
+    title: 'Apply with confidence',
     description:
-      'Checkpointed stages keep progress steady even when data is messy.',
-    items: [
-      'Checkpointed stages keep flow intact.',
-      'Automatic retries for small hiccups.',
-      'Independent queues for discovery and analysis.',
-    ],
-  },
-  {
-    title: 'Progress stays visible',
-    description: 'Every match shows where it sits and what comes next.',
-    items: [
-      'Queued → running → delivered at a glance.',
-      'Live results as each stage finishes.',
-      'Organized output for filtering and search.',
-    ],
+      'Know exactly why you\'re a fit before you click send.',
   },
 ];
 
@@ -106,42 +43,36 @@ const socialLinks = [
   { href: `mailto:${siteConfig.links.mail}`, label: 'Email', icon: Mail },
 ];
 
-const trustMarks = [
-  'Talent teams',
-  'Career coaches',
-  'Product orgs',
-  'Founders',
-  'Studios',
+const mockMatchCards = [
+  {
+    title: 'Senior Frontend Engineer',
+    company: 'Stripe',
+    matchPercent: 94,
+  },
+  {
+    title: 'Staff Software Engineer',
+    company: 'Vercel',
+    matchPercent: 91,
+  },
+  {
+    title: 'Product Engineer',
+    company: 'Linear',
+    matchPercent: 88,
+  },
 ];
 
 const primaryCtaClass =
-  'group px-8 py-4 text-base font-semibold tracking-tight shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 dark:shadow-amber-500/30 dark:hover:shadow-amber-400/45';
-const sectionCardClass =
-  'rounded-3xl border border-border/50 bg-background/70 p-8 shadow-sm dark:border-amber-200/10 dark:bg-slate-950/55';
-const featureCardClass =
-  'rounded-2xl border border-border/50 bg-background/60 p-6 shadow-sm dark:border-amber-200/10 dark:bg-slate-950/55';
-const surfacePanelClass =
-  'rounded-2xl border border-border/50 bg-background/60 px-4 py-3 text-[13px] font-medium tracking-tight text-muted-foreground dark:border-amber-200/10 dark:bg-slate-950/50 dark:text-amber-100/70';
-const smallDescriptionClass =
-  'text-[13.5px] font-medium tracking-tight text-muted-foreground';
-const stepBadgeClass =
-  'flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary dark:bg-amber-500/15 dark:text-amber-100/90';
-const miniStepBadgeClass =
-  'flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary dark:bg-amber-500/15 dark:text-amber-100/90';
+  'group px-8 py-4 text-base font-semibold tracking-tight shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 dark:shadow-amber-500/30 dark:hover:shadow-amber-400/45 cta-pulse';
 const serifDisplayClass =
   "font-['Perfectly_Nineties',serif] font-normal tracking-[-0.06em]";
 const serifSectionClass =
   "font-['Perfectly_Nineties',serif] font-normal tracking-[-0.06em]";
-const eyebrowClass =
-  'text-xs font-semibold uppercase tracking-[0.32em] text-muted-foreground';
-const heroTitleClass = `mx-auto max-w-5xl text-[clamp(2.9rem,6.8vw,5.8rem)] leading-[0.95] ${serifDisplayClass}`;
+const heroTitleClass = `mx-auto max-w-4xl text-[clamp(2.6rem,6vw,5rem)] leading-[1.05] ${serifDisplayClass}`;
 const heroDescriptionClass =
-  'mx-auto max-w-2xl text-pretty tracking-tight text-[14px] leading-[1.6] text-muted-foreground sm:text-lg';
+  'mx-auto max-w-xl text-pretty tracking-tight text-[15px] leading-[1.65] text-muted-foreground sm:text-lg';
 const heroOrbClass =
-  'pointer-events-none absolute left-1/2 top-0 -z-10 h-[420px] w-[520px] -translate-x-1/2 -translate-y-[30%] rounded-full bg-linear-to-b from-amber-300/14 via-stone-200/6 to-transparent blur-3xl opacity-70 dark:from-amber-200/10 dark:via-slate-200/6 dark:opacity-40';
-const sectionTitleClass = `text-[clamp(2.1rem,4.6vw,3.6rem)] leading-[1.05] ${serifSectionClass}`;
-const sectionDescriptionClass =
-  'mx-auto max-w-2xl text-pretty text-base text-muted-foreground';
+  'pointer-events-none absolute left-1/2 top-0 -z-10 h-[480px] w-[600px] -translate-x-1/2 -translate-y-[30%] rounded-full bg-linear-to-b from-amber-300/18 via-stone-200/8 to-transparent blur-3xl opacity-80 dark:from-amber-200/14 dark:via-slate-200/6 dark:opacity-50';
+const sectionTitleClass = `text-[clamp(2rem,4.2vw,3.2rem)] leading-[1.1] ${serifSectionClass}`;
 const finaleGlowClass =
   'pointer-events-none absolute left-1/2 top-[-40%] h-[180%] w-[150%] -translate-x-1/2 rounded-[999px] bg-linear-to-b from-stone-400/10 via-stone-300/4 to-transparent blur-3xl opacity-60 dark:from-slate-400/8 dark:via-slate-300/3 dark:opacity-30';
 const ctaPanelClass =
@@ -151,63 +82,95 @@ const ctaOrbClass =
 const revealStyle = (delayMs: number): CSSProperties =>
   ({ '--reveal-delay': `${delayMs}ms` }) as CSSProperties;
 
-const PrimaryCtaButton = () => (
-  <Button asChild size="lg" className={primaryCtaClass}>
-    <Link href="/signin">
-      Get started
-      <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
-        →
-      </span>
-    </Link>
-  </Button>
+const PrimaryCtaButton = ({ showMicroCopy = false }: { showMicroCopy?: boolean }) => (
+  <div className="flex flex-col items-center gap-3">
+    <Button asChild size="lg" className={primaryCtaClass}>
+      <Link href="/signin">
+        Start matching
+        <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
+          →
+        </span>
+      </Link>
+    </Button>
+    {showMicroCopy && (
+      <p className="text-xs text-muted-foreground/80 tracking-tight">
+        Free to try. No credit card. 2 minutes to your first match.
+      </p>
+    )}
+  </div>
 );
 
-const SectionHeader = ({
-  eyebrow,
-  title,
-  description,
+const ProductPreviewMockup = () => (
+  <div
+    className="relative mt-8 w-full max-w-md mx-auto landing-reveal"
+    style={revealStyle(520)}
+  >
+    <div className="relative transform perspective-1000 rotate-x-2 hover:rotate-x-0 transition-transform duration-500">
+      <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent rounded-2xl blur-xl" />
+      <div className="relative space-y-3 rounded-2xl border border-border/40 bg-background/80 p-4 shadow-2xl shadow-amber-500/10 backdrop-blur-sm dark:border-amber-200/10 dark:bg-slate-950/70 dark:shadow-amber-400/15">
+        {mockMatchCards.map((card, index) => (
+          <div
+            key={card.title}
+            className={`flex items-center justify-between rounded-xl border border-border/50 bg-background/60 px-4 py-3 transition-all duration-300 dark:border-amber-200/5 dark:bg-slate-900/50 ${
+              index === 0 ? 'ring-1 ring-amber-500/20 dark:ring-amber-400/30' : ''
+            }`}
+            style={{ opacity: 1 - index * 0.12 }}
+          >
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium text-foreground/90">
+                {card.title}
+              </span>
+              <span className="text-xs text-muted-foreground">{card.company}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                {card.matchPercent}%
+              </span>
+              <span className="text-xs text-muted-foreground/70">match</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const PromiseStep = ({
+  step,
+  index,
 }: {
-  eyebrow: string;
-  title: string;
-  description: string;
+  step: (typeof promiseSteps)[0];
+  index: number;
 }) => (
-  <div className="flex flex-col items-center gap-3 text-center">
-    <p className={`${eyebrowClass} w-fit`}>{eyebrow}</p>
-    <h2 className={`text-gradient-subtle ${sectionTitleClass}`}>{title}</h2>
-    <p className={sectionDescriptionClass}>{description}</p>
+  <div
+    className="promise-step group relative flex flex-col gap-4 rounded-2xl border border-border/50 bg-background/60 p-6 transition-all duration-300 dark:border-amber-200/10 dark:bg-slate-950/55 landing-reveal"
+    style={revealStyle(600 + index * 100)}
+  >
+    <div className="flex items-center gap-4">
+      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-amber-500/10 text-sm font-semibold text-amber-700 dark:bg-amber-500/15 dark:text-amber-200">
+        {step.number}
+      </span>
+      <h3 className={`text-xl ${serifSectionClass}`}>{step.title}</h3>
+    </div>
+    <p className="text-[14px] leading-relaxed text-muted-foreground pl-[60px]">
+      {step.description}
+    </p>
   </div>
 );
 
 export function LandingClient() {
-  const { data: session } = authClient.useSession();
-  const {
-    data: healthCheck,
-    isLoading,
-    error,
-  } = useQuery(trpc.healthCheck.queryOptions());
-  const firstName = session?.user?.name?.split(' ')[0];
-  const statusText = error
-    ? 'Pipeline: offline'
-    : isLoading
-      ? 'Checking pipeline...'
-      : healthCheck
-        ? `Pipeline: ${healthCheck}`
-        : 'Pipeline: unavailable';
-  const greeting = firstName
-    ? `Welcome back, ${firstName}.`
-    : 'Curated matches, always in motion.';
-
   return (
     <div className="relative min-h-full bg-background" data-landing-root>
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         {glowOrbs.map((className, index) => (
           <div key={`glow-${index}`} className={className} aria-hidden="true" />
         ))}
-        <DragonLines className="opacity-80" />
+        <DragonLines className="opacity-90" primaryClassName="opacity-80" />
         <DragonLines className="top-auto bottom-[-180px] opacity-70" />
       </div>
 
-      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-28 px-6 pb-20 pt-12 lg:px-10">
+      <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-32 px-6 pb-20 pt-12 lg:px-10">
+        {/* Header */}
         <header
           className="flex items-center justify-between gap-6 landing-reveal"
           style={revealStyle(40)}
@@ -226,169 +189,79 @@ export function LandingClient() {
           </Link>
         </header>
 
-        <section className="relative isolate mx-auto flex max-w-5xl flex-col items-center gap-8 text-center lg:gap-10">
+        {/* Hero Section */}
+        <section className="relative isolate mx-auto flex max-w-4xl flex-col items-center gap-8 text-center lg:gap-10">
           <div aria-hidden="true" className={heroOrbClass} />
           <div className="space-y-6">
-            <p
-              className={`${eyebrowClass} mx-auto w-fit landing-reveal`}
-              style={revealStyle(120)}
-            >
-              Career matching, refined
-            </p>
             <h1
               className={`text-balance ${heroTitleClass} landing-reveal`}
-              style={revealStyle(200)}
+              style={revealStyle(120)}
             >
-              The matching workspace for focused career moves.
+              <span className="text-gradient-subtle">AI should land you jobs.</span>
+              <br />
+              <span className="text-gradient-brand">Not take them.</span>
             </h1>
             <p
               className={`${heroDescriptionClass} landing-reveal`}
-              style={revealStyle(280)}
+              style={revealStyle(200)}
             >
-              Save thousands of hours searching and applying to roles you don't
-              fit.
+              While everyone worries about AI taking jobs, you'll use it to find yours.
+              <br className="hidden sm:block" />
+              Upload your resume. Get matched to roles that actually fit.
             </p>
           </div>
           <div
-            className="flex flex-col items-center justify-center gap-4 sm:flex-row landing-reveal"
-            style={revealStyle(360)}
+            className="flex flex-col items-center justify-center gap-4 landing-reveal"
+            style={revealStyle(280)}
           >
-            <PrimaryCtaButton />
+            <PrimaryCtaButton showMicroCopy />
           </div>
-          <div
-            className="flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground landing-reveal"
-            style={revealStyle(440)}
-          >
-            <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1 dark:border-amber-200/10 dark:bg-slate-950/60 dark:text-amber-100/80">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400/70 dark:bg-emerald-300/70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400 dark:bg-emerald-300" />
-              </span>
-              {statusText}
-            </span>
-            <span className="text-xs tracking-tight font-medium text-muted-foreground">
-              {greeting}
-            </span>
-          </div>
+          <ProductPreviewMockup />
         </section>
 
-        <section id="momentum" className="grid gap-10 scroll-mt-24">
-          <SectionHeader
-            eyebrow="Designed for focus"
-            title="Move with clarity, not noise."
-            description="Every step stays crisp, calm, and deliberate."
-          />
-          <div className="grid gap-6 md:grid-cols-3">
-            {featureHighlights.map((item) => (
-              <div key={item.title} className={featureCardClass}>
-                <h3 className={`text-xl ${serifSectionClass}`}>{item.title}</h3>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
+        {/* The Promise Section */}
+        <section id="promise" className="grid gap-12 scroll-mt-24">
+          <div className="flex flex-col items-center gap-4 text-center">
+            <h2
+              className={`text-gradient-subtle ${sectionTitleClass} landing-reveal`}
+              style={revealStyle(500)}
+            >
+              Three steps. Zero guesswork.
+            </h2>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {promiseSteps.map((step, index) => (
+              <PromiseStep key={step.title} step={step} index={index} />
             ))}
           </div>
         </section>
 
-        <section id="workflow" className="grid gap-10 scroll-mt-24">
-          <SectionHeader
-            eyebrow="The flow"
-            title="Four steps, always in motion."
-            description="From resume to matches in a steady stream."
-          />
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {workflowSteps.map((step, index) => (
-              <div
-                key={step.title}
-                className="group relative overflow-hidden rounded-2xl border border-border/50 bg-background/60 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-amber-200/10 dark:bg-slate-950/60 dark:hover:shadow-amber-500/20"
-              >
-                <div className="flex items-center gap-3">
-                  <span className={stepBadgeClass}>{`0${index + 1}`}</span>
-                  <h3 className={`text-lg ${serifSectionClass}`}>
-                    {step.title}
-                  </h3>
-                </div>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {step.description}
-                </p>
-                <div className="mt-4 h-px w-full bg-linear-to-r from-transparent via-border to-transparent" />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="grid gap-8 lg:grid-cols-2">
-          {detailBlocks.map((block) => (
-            <div key={block.title} className={sectionCardClass}>
-              <p className={eyebrowClass}>{block.eyebrow}</p>
-              <h3 className={`mt-3 text-2xl text-balance ${serifSectionClass}`}>
-                {block.title}
-              </h3>
-              <p className="mt-3 text-sm text-muted-foreground">
-                {block.description}
-              </p>
-              <div className="mt-6 grid gap-3">
-                {block.items.map((item, index) => (
-                  <div
-                    key={item}
-                    className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background/60 px-4 py-3 dark:border-amber-200/10 dark:bg-slate-950/50"
-                  >
-                    <span className={miniStepBadgeClass}>{index + 1}</span>
-                    <p className={smallDescriptionClass}>{item}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </section>
-
-        <section id="reliability" className="grid gap-10 scroll-mt-24">
-          <SectionHeader
-            eyebrow="Reliability"
-            title="Engineered for steady progress."
-            description="Quiet systems keep the stream moving even when the data is messy."
-          />
-          <div className="grid gap-6 lg:grid-cols-2">
-            {reliabilitySections.map((section) => (
-              <div key={section.title} className={sectionCardClass}>
-                <h3 className={`text-2xl ${serifSectionClass}`}>
-                  {section.title}
-                </h3>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {section.description}
-                </p>
-                <div className="mt-6 grid gap-4">
-                  {section.items.map((item) => (
-                    <div
-                      key={item}
-                      className="flex gap-3 rounded-2xl border border-border/60 bg-background/70 p-4 dark:border-amber-200/10 dark:bg-slate-950/55"
-                    >
-                      <span className="mt-1 h-2 w-2 rounded-full bg-amber-400/80 dark:bg-amber-300/90" />
-                      <p className={smallDescriptionClass}>{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
+        {/* Final CTA */}
         <div className="relative isolate flex flex-col gap-10">
           <div aria-hidden="true" className={finaleGlowClass} />
           <section className={ctaPanelClass}>
             <div aria-hidden="true" className={ctaOrbClass} />
-            <h2 className={`heading-md text-balance ${serifSectionClass}`}>
-              Ready for your next adventure?
+            <h2
+              className={`text-gradient-subtle text-balance ${sectionTitleClass} landing-reveal`}
+              style={revealStyle(900)}
+            >
+              Your next role is waiting.
             </h2>
-            <p className="mt-4 text-pretty text-base text-muted-foreground">
-              Start with a focused profile, then let the matching run in the
-              background.
+            <p
+              className="mt-2 text-pretty text-base text-muted-foreground landing-reveal"
+              style={revealStyle(980)}
+            >
+              Most users see their first matches within 2 minutes.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div
+              className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row landing-reveal"
+              style={revealStyle(1060)}
+            >
               <PrimaryCtaButton />
             </div>
           </section>
 
+          {/* Footer */}
           <footer className="relative grid gap-8 border-t border-border/60 pt-8 text-sm text-muted-foreground dark:border-amber-200/10 sm:grid-cols-[1.1fr_0.9fr]">
             <div className="relative z-10 flex flex-col gap-4 text-center sm:text-left">
               <div className="flex flex-col items-center gap-3 sm:flex-row">
@@ -406,7 +279,7 @@ export function LandingClient() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Calm matching, deliberate moves.
+                AI-powered career matching.
               </p>
             </div>
             <div className="relative z-10 flex flex-col items-center gap-4 sm:items-end">

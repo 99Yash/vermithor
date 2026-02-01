@@ -34,9 +34,9 @@ type DragonLinesProps = {
   secondaryClassName?: string;
 };
 
-const lineToneClass = 'text-amber-700/30 dark:text-amber-200/25';
+const lineToneClass = 'text-amber-700/40 dark:text-amber-200/30';
 const baseSvgClass =
-  'dragon-drift absolute left-1/2 w-[120vw] -translate-x-1/2';
+  'dragon-drift absolute left-1/2 w-[140vw] -translate-x-1/2';
 
 export function DragonLines({
   className,
@@ -53,7 +53,7 @@ export function DragonLines({
     >
       <svg
         className={cn(
-          `${baseSvgClass} top-[-120px] h-[360px] opacity-70`,
+          `${baseSvgClass} top-[-120px] h-[420px] opacity-80`,
           primaryClassName
         )}
         viewBox="0 0 1800 520"
@@ -80,7 +80,7 @@ export function DragonLines({
       </svg>
       <svg
         className={cn(
-          `${baseSvgClass} top-[120px] h-[320px] opacity-50`,
+          `${baseSvgClass} top-[100px] h-[380px] opacity-60`,
           secondaryClassName
         )}
         viewBox="0 0 1800 520"

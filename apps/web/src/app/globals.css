@@ -332,6 +332,64 @@
     animation: dragon-drift 16s ease-in-out infinite;
   }
 
+  /* CTA Pulse Animation */
+  @keyframes cta-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 10px 25px -5px rgb(217 119 6 / 0.2),
+        0 0 0 0 rgb(217 119 6 / 0.15);
+    }
+    50% {
+      box-shadow:
+        0 10px 30px -5px rgb(217 119 6 / 0.3),
+        0 0 0 8px rgb(217 119 6 / 0);
+    }
+  }
+
+  .cta-pulse {
+    animation: cta-pulse 3s ease-in-out infinite;
+  }
+
+  .dark .cta-pulse {
+    animation: cta-pulse-dark 3s ease-in-out infinite;
+  }
+
+  @keyframes cta-pulse-dark {
+    0%,
+    100% {
+      box-shadow:
+        0 10px 25px -5px rgb(251 191 36 / 0.3),
+        0 0 0 0 rgb(251 191 36 / 0.2);
+    }
+    50% {
+      box-shadow:
+        0 10px 30px -5px rgb(251 191 36 / 0.4),
+        0 0 0 8px rgb(251 191 36 / 0);
+    }
+  }
+
+  /* Promise Step Hover Effect */
+  .promise-step {
+    transform: translateY(0);
+    transition:
+      transform 0.3s cubic-bezier(0.21, 0.61, 0.35, 1),
+      box-shadow 0.3s ease;
+  }
+
+  .promise-step:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 12px 24px -8px rgb(217 119 6 / 0.12),
+      0 4px 8px -2px rgb(0 0 0 / 0.04);
+  }
+
+  .dark .promise-step:hover {
+    box-shadow:
+      0 12px 24px -8px rgb(251 191 36 / 0.15),
+      0 4px 8px -2px rgb(0 0 0 / 0.2);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .landing-reveal,
     .landing-fade {
@@ -341,6 +399,19 @@
 
     .dragon-drift {
       animation: none;
+    }
+
+    .cta-pulse,
+    .dark .cta-pulse {
+      animation: none;
+    }
+
+    .promise-step {
+      transition: none;
+    }
+
+    .promise-step:hover {
+      transform: none;
     }
   }
 
